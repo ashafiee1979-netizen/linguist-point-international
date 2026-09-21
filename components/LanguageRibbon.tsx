@@ -49,14 +49,15 @@ export const LanguageRibbon: React.FC = () => {
   return (
     <div className="bg-slate-50 border-b border-slate-200 py-2.5">
       <div className="max-w-7xl mx-auto px-4 flex items-center gap-3">
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-700 whitespace-nowrap">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Global Languages:</span>
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-700 whitespace-nowrap flex-shrink-0">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+          <span className="hidden sm:inline">Global Languages:</span>
+          <span className="sm:hidden">Languages:</span>
         </div>
 
         <button
           onClick={() => scroll("left")}
-          className="p-1 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
+          className="hidden sm:block p-1 rounded-full text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
           aria-label="Scroll left"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -64,7 +65,7 @@ export const LanguageRibbon: React.FC = () => {
 
         <div
           ref={scrollRef}
-          className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth flex-grow py-1"
+          className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth flex-grow min-w-0 py-1"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {POPULAR_FLAGS.map((item) => (
@@ -85,7 +86,7 @@ export const LanguageRibbon: React.FC = () => {
 
         <button
           onClick={() => scroll("right")}
-          className="p-1 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
+          className="hidden sm:block p-1 rounded-full text-slate-500 hover:bg-slate-200 transition-colors flex-shrink-0"
           aria-label="Scroll right"
         >
           <ChevronRight className="w-4 h-4" />

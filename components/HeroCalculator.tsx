@@ -1,35 +1,66 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckCircle2, Shield, Clock, Award, ArrowRight } from "lucide-react";
-import { ALL_LANGUAGES, POPULAR_LANGUAGES } from "@/lib/languages";
-import { calculateOrderPrice } from "@/lib/mock-data";
+import { CheckCircle2, Clock, Star, ArrowRight, ShieldCheck } from "lucide-react";
+import { OTHER_LANGUAGES, POPULAR_LANGUAGES } from "@/lib/languages";
+import { calculatePrice, PRICING } from "@/lib/pricing";
+import type { ServiceType } from "@/lib/pricing";
+import { SITE } from "@/lib/site";
+import type { OrderDraft } from "@/lib/order";
+import { Select } from "@/components/ui/Select";
+import { inputClass, labelClass } from "@/lib/ui";
 
 interface HeroCalculatorProps {
-  onOpenOrder: (initialState?: any) => void;
+  onOpenOrder: (draft?: Partial<OrderDraft>) => void;
+  /** Lets the pricing cards below switch the calculator into standard mode. */
+  serviceType: ServiceType;
+  onServiceTypeChange: (serviceType: ServiceType) => void;
 }
 
-export const HeroCalculator: React.FC<HeroCalculatorProps> = ({ onOpenOrder }) => {
-  const [sourceLang, setSourceLang] = useState<string>("");
-  const [targetLang, setTargetLang] = useState<string>("");
-  const [customSourceLang, setCustomSourceLang] = useState<string>("");
-  const [pageCount, setPageCount] = useState<number>(1);
-  const [isRush, setIsRush] = useState<boolean>(false);
-  const [isNotarized, setIsNotarized] = useState<boolean>(false);
-  const [isHardCopy, setIsHardCopy] = useState<boolean>(false);
+const ADD_ONS = [
+  { key: "rush", label: "12-Hour Priority Express Rush", fee: PRICING.rushFee },
+  { key: "notarized", label: "Notarized Certificate & Seal", fee: PRICING.notarizationFee },
+  { key: "hardCopy", label: "Wet-Ink Physical Hard Copy via Priority Mail", fee: PRICING.shippingFee },
+] as const;
 
-  const price = calculateOrderPrice({
+const SLIDER_MAX = 25;
+
+export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
+  onOpenOrder,
+  serviceType,
+  onServiceTypeChange,
+}) => {
+  const [sourceLang, setSourceLang] = useState("");
+  const [targetLang, setTargetLang] = useState("");
+  const [customSourceLang, setCustomSourceLang] = useState("");
+  const [pageCount, setPageCount] = useState(1);
+  const [wordCount, setWordCount] = useState(250);
+  const [isRush, setIsRush] = useState(false);
+  const [isNotarized, setIsNotarized] = useState(false);
+  const [isHardCopy, setIsHardCopy] = useState(false);
+
+  const price = calculatePrice({
+    serviceType,
     pageCount,
+    wordCount,
     isRush12Hour: isRush,
     isNotarized,
     isHardCopyMail: isHardCopy,
   });
 
+  const addOnState: Record<string, [boolean, (value: boolean) => void]> = {
+    rush: [isRush, setIsRush],
+    notarized: [isNotarized, setIsNotarized],
+    hardCopy: [isHardCopy, setIsHardCopy],
+  };
+
   const handleStartOrder = () => {
     onOpenOrder({
+      serviceType,
       sourceLang: sourceLang === "other" ? customSourceLang : sourceLang,
       targetLang,
       pageCount,
+      wordCount,
       isRush,
       isNotarized,
       isHardCopy,
@@ -37,232 +68,307 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({ onOpenOrder }) =
     });
   };
 
+  const renderLanguageOptions = (prefix: string) => (
+    <>
+      <optgroup label="Popular Languages">
+        {POPULAR_LANGUAGES.map((l) => (
+          <option key={`${prefix}-${l.code}`} value={l.name}>
+            {l.name}
+          </option>
+        ))}
+      </optgroup>
+      <optgroup label="All Languages (A to Z)">
+        {OTHER_LANGUAGES.map((l) => (
+          <option key={`${prefix}-all-${l.code}`} value={l.name}>
+            {l.name}
+          </option>
+        ))}
+      </optgroup>
+    </>
+  );
+
   return (
-    <section className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50 py-16 lg:py-20 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        
+    <section className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50 py-12 sm:py-16 lg:py-20 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+
         {/* Left Column: Value Proposition */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-900 text-xs font-bold tracking-wide uppercase">
-            <span className="w-2 h-2 rounded-full bg-[#173d40]"></span>
-            USCIS &amp; Official Regulatory Compliant
+        <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-900 text-[11px] sm:text-xs font-bold tracking-wide uppercase">
+            <span className="w-2 h-2 rounded-full bg-[#173d40]" aria-hidden="true"></span>
+            #1 Rated Human Translation Agency • ATA Corporate Member
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
-            Official Certified <br />
-            <span className="text-[#173d40]">Document Translation</span>
+          <h1 className="text-[2rem] leading-[1.15] sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight sm:leading-[1.12]">
+            Official Certified Translation in{" "}
+            <span className="block text-[#173d40]">{SITE.languageCount} Languages to English</span>
           </h1>
 
-          <p className="text-lg text-slate-600 max-w-2xl leading-relaxed">
-            Guaranteed 100% acceptance by <strong>USCIS</strong>, foreign consulates, courts, universities, and federal agencies. Word-for-word legal accuracy with official stamps, ATA member certification, and rapid 24-hour turnaround.
+          <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
+            Accredited, human-powered certified &amp; commercial translations starting at just{" "}
+            <strong className="text-[#173d40]">${PRICING.pricePerPage.toFixed(2)} / page</strong> (Save 20% vs. industry rates). Fully guaranteed for official acceptance worldwide with standard 24-hour turnaround.
           </p>
 
-          {/* Value Bullet Points */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            {[
-              "100% Acceptance Guarantee (USCIS & Courts)",
-              "Fast 24-Hour Digital PDF Delivery (12h Rush Available)",
-              "Signed & Stamped Certificate of Accuracy",
-              "ATA Corporate Member #274819 Backed",
-            ].map((text, idx) => (
-              <div key={idx} className="flex items-start gap-2 text-sm font-semibold text-slate-700">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <span>{text}</span>
-              </div>
-            ))}
+          <div className="flex items-start gap-2.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+            <p>
+              <strong className="text-slate-900">Guaranteed 100% Acceptance:</strong> USCIS, U.S. Dept of State, WES, Academic Institutions, Federal/State Courts, DMVs, Embassies, and non-governmental entities worldwide.
+            </p>
           </div>
 
-          {/* Heritage Trust Badges */}
-          <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center gap-6">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-              <Award className="w-4 h-4 text-[#f59e0b]" />
-              Enterprise Heritage:
-            </div>
-            <div className="flex items-center gap-4 grayscale opacity-70 hover:opacity-100 transition-opacity">
-              <span className="font-extrabold text-xs text-slate-700">PUL Global Partners</span>
-              <span className="text-slate-300">•</span>
-              <span className="font-extrabold text-xs text-slate-700">PUL Consulting Services</span>
-              <span className="text-slate-300">•</span>
-              <span className="font-extrabold text-xs text-[#173d40]">5,000+ Verified Clients</span>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => onOpenOrder({ serviceType })}
+              className="bg-[#173d40] hover:bg-[#123032] text-white font-extrabold py-3.5 px-7 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-98 text-sm"
+            >
+              Start Your Order
+              <ArrowRight className="w-4 h-4" strokeWidth={2.25} />
+            </button>
+            <a
+              href="#enterprise-proposal"
+              className="bg-white border-2 border-[#173d40] text-[#173d40] hover:bg-[#173d40] hover:text-white font-extrabold py-3.5 px-7 rounded-xl flex items-center justify-center gap-2 transition-all text-sm"
+            >
+              Request Project Quote
+            </a>
+          </div>
+
+          <div className="pt-5 sm:pt-6 border-t border-slate-200 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="flex items-center gap-1 text-[#f59e0b]" aria-hidden="true">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-4 h-4 fill-current" />
+              ))}
+            </span>
+            <span className="text-sm font-extrabold text-slate-900">{SITE.rating} Rating</span>
+            <span className="text-slate-300" aria-hidden="true">|</span>
+            <span className="text-xs font-semibold text-slate-600">
+              {SITE.clientCount} Verified Certified Documents Delivered
+            </span>
           </div>
         </div>
 
         {/* Right Column: Instant Live Order Calculator */}
-        <div className="lg:col-span-5" id="order">
-          <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 sm:p-8 shadow-xl relative">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
-              <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-[#173d40]">Instant Cost Builder</span>
-                <h3 className="text-xl font-bold text-slate-900">Calculate &amp; Order</h3>
-              </div>
-              <div className="text-right">
-                <span className="text-xs text-slate-500 block">Starting at</span>
-                <span className="text-2xl font-extrabold text-[#173d40]">$24.95</span>
-                <span className="text-xs text-slate-500">/page</span>
-              </div>
+        <div className="lg:col-span-5 w-full" id="order">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xl shadow-slate-900/5 relative">
+            <div className="border-b border-slate-100 pb-4 mb-5">
+              <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-[#173d40]">
+                Instant Cost Builder
+              </span>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Calculate &amp; Order</h2>
             </div>
 
-            <div className="space-y-4">
-              {/* Language Selection Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Source Language</label>
-                  <select
-                    value={sourceLang}
-                    onChange={(e) => setSourceLang(e.target.value)}
-                    className={`w-full h-11 px-3 rounded-lg border text-sm focus:ring-2 focus:ring-teal-500 outline-none transition-all ${
-                      !sourceLang ? "text-slate-400 italic border-slate-300 bg-slate-50" : "text-slate-900 font-semibold border-slate-300 bg-white"
+            {/* Service type toggle */}
+            <div
+              className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl mb-5"
+              role="group"
+              aria-label="Translation service type"
+            >
+              {(
+                [
+                  { type: "certified" as const, label: "Certified", price: `$${PRICING.pricePerPage.toFixed(2)}/pg` },
+                  { type: "standard" as const, label: "Standard", price: `$${PRICING.pricePerWord.toFixed(2)}/wd` },
+                ]
+              ).map((option) => {
+                const active = serviceType === option.type;
+                return (
+                  <button
+                    key={option.type}
+                    type="button"
+                    onClick={() => onServiceTypeChange(option.type)}
+                    aria-pressed={active}
+                    className={`px-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                      active
+                        ? "bg-white text-[#173d40] shadow-sm"
+                        : "text-slate-500 hover:text-slate-700"
                     }`}
                   >
-                    <option value="" disabled>Select Language</option>
-                    <optgroup label="Popular Languages">
-                      {POPULAR_LANGUAGES.map((l) => (
-                        <option key={`src-${l.code}`} value={l.name}>
-                          {l.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="All Languages (A to Z)">
-                      {ALL_LANGUAGES.map((l) => (
-                        <option key={`src-all-${l.code}`} value={l.name}>
-                          {l.name}
-                        </option>
-                      ))}
-                    </optgroup>
+                    <span className="block">{option.label}</span>
+                    <span className={`block text-[11px] font-semibold ${active ? "text-slate-500" : "text-slate-400"}`}>
+                      {option.price}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="space-y-5">
+              {/* Language Selection Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="hero-source" className={labelClass}>
+                    Source Language
+                  </label>
+                  <Select
+                    id="hero-source"
+                    value={sourceLang}
+                    isPlaceholder={!sourceLang}
+                    onChange={(e) => setSourceLang(e.target.value)}
+                  >
+                    <option value="" disabled>
+                      Select Language
+                    </option>
+                    {renderLanguageOptions("src")}
                     <option value="other">Other / Language Not Listed</option>
-                  </select>
+                  </Select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Target Language</label>
-                  <select
+                  <label htmlFor="hero-target" className={labelClass}>
+                    Target Language
+                  </label>
+                  <Select
+                    id="hero-target"
                     value={targetLang}
+                    isPlaceholder={!targetLang}
                     onChange={(e) => setTargetLang(e.target.value)}
-                    className={`w-full h-11 px-3 rounded-lg border text-sm focus:ring-2 focus:ring-teal-500 outline-none transition-all ${
-                      !targetLang ? "text-slate-400 italic border-slate-300 bg-slate-50" : "text-slate-900 font-semibold border-slate-300 bg-white"
-                    }`}
                   >
-                    <option value="" disabled>Select Language</option>
-                    <optgroup label="Popular Languages">
-                      {POPULAR_LANGUAGES.map((l) => (
-                        <option key={`tgt-${l.code}`} value={l.name}>
-                          {l.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="All Languages (A to Z)">
-                      {ALL_LANGUAGES.map((l) => (
-                        <option key={`tgt-all-${l.code}`} value={l.name}>
-                          {l.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  </select>
+                    <option value="" disabled>
+                      Select Language
+                    </option>
+                    {renderLanguageOptions("tgt")}
+                  </Select>
                 </div>
               </div>
 
               {/* Other Language Input */}
               {sourceLang === "other" && (
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Specify Source Language *</label>
+                <div className="animate-fade-in">
+                  <label htmlFor="hero-custom-source" className={labelClass}>
+                    Specify Source Language *
+                  </label>
                   <input
+                    id="hero-custom-source"
                     type="text"
-                    placeholder="e.g. Kurdish Sorani, Tigrinya, Fulani"
+                    placeholder="e.g. Kurdish Sorani, Hmong, Tigre, Oromo, Basque…"
                     value={customSourceLang}
                     onChange={(e) => setCustomSourceLang(e.target.value)}
-                    className="w-full h-10 px-3 rounded-lg border border-teal-500 bg-teal-50 text-sm outline-none font-medium"
+                    className={`${inputClass} border-teal-500 bg-teal-50/60`}
                     required
                   />
                 </div>
               )}
 
-              {/* Page Counter */}
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-xs font-bold text-slate-700">Page Count (250 words/page)</label>
-                  <span className="text-xs text-slate-500 font-medium">${(pageCount * 24.95).toFixed(2)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPageCount(Math.max(1, pageCount - 1))}
-                    className="w-11 h-11 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-lg transition-colors flex items-center justify-center"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    min="1"
-                    max="1000"
-                    value={pageCount}
-                    onChange={(e) => setPageCount(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="flex-grow h-11 text-center font-bold text-slate-900 border border-slate-300 rounded-lg outline-none text-base"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setPageCount(pageCount + 1)}
-                    className="w-11 h-11 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-lg transition-colors flex items-center justify-center"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Add-ons Checkboxes */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <label className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors text-xs">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={isRush}
-                      onChange={(e) => setIsRush(e.target.checked)}
-                      className="w-4 h-4 text-[#173d40] rounded focus:ring-teal-500"
-                    />
-                    <span className="font-semibold text-slate-800">12-Hour Priority Express Rush</span>
-                  </div>
-                  <span className="font-bold text-slate-700">+$14.95</span>
-                </label>
-
-                <label className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors text-xs">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={isNotarized}
-                      onChange={(e) => setIsNotarized(e.target.checked)}
-                      className="w-4 h-4 text-[#173d40] rounded focus:ring-teal-500"
-                    />
-                    <span className="font-semibold text-slate-800">Notarized Certificate &amp; Seal</span>
-                  </div>
-                  <span className="font-bold text-slate-700">+$19.95</span>
-                </label>
-
-                <label className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors text-xs">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={isHardCopy}
-                      onChange={(e) => setIsHardCopy(e.target.checked)}
-                      className="w-4 h-4 text-[#173d40] rounded focus:ring-teal-500"
-                    />
-                    <span className="font-semibold text-slate-800">Wet-Ink Physical Hard Copy via Priority Mail</span>
-                  </div>
-                  <span className="font-bold text-slate-700">+$12.50</span>
-                </label>
-              </div>
-
-              {/* Total & Action Button */}
-              <div className="pt-3 border-t border-slate-200">
-                <div className="flex items-baseline justify-between mb-3">
-                  <div>
-                    <span className="text-xs text-slate-500 block">Total Quote Estimate</span>
-                    <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> Delivery: {price.estimatedDeliveryHours} Hours
+              {/* Volume control: pages for certified, words for standard */}
+              {serviceType === "certified" ? (
+                <div>
+                  <div className="flex justify-between items-center mb-2 gap-2">
+                    <label htmlFor="hero-pages" className="text-xs font-bold text-slate-700">
+                      Page Count (250 words/page)
+                    </label>
+                    <span className="text-xs font-extrabold text-[#173d40] bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full">
+                      {pageCount} {pageCount === 1 ? "Page" : "Pages"}
                     </span>
                   </div>
-                  <div className="text-3xl font-extrabold text-[#173d40]">
-                    ${price.totalAmount.toFixed(2)}
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPageCount(Math.max(1, pageCount - 1))}
+                      disabled={pageCount <= 1}
+                      className="w-11 h-11 flex-shrink-0 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:hover:bg-white text-slate-800 font-extrabold text-lg shadow-xs transition-all flex items-center justify-center"
+                      aria-label="Decrease page count"
+                    >
+                      −
+                    </button>
+                    <input
+                      id="hero-pages"
+                      type="range"
+                      min={1}
+                      max={SLIDER_MAX}
+                      value={Math.min(pageCount, SLIDER_MAX)}
+                      onChange={(e) => setPageCount(parseInt(e.target.value, 10))}
+                      className="flex-grow min-w-0 h-2 accent-[#173d40] cursor-pointer"
+                      aria-label="Page count"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPageCount(Math.min(PRICING.maxPages, pageCount + 1))}
+                      disabled={pageCount >= PRICING.maxPages}
+                      className="w-11 h-11 flex-shrink-0 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:hover:bg-white text-slate-800 font-extrabold text-lg shadow-xs transition-all flex items-center justify-center"
+                      aria-label="Increase page count"
+                    >
+                      +
+                    </button>
                   </div>
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    More than {SLIDER_MAX} pages? Use +, or{" "}
+                    <a href="#enterprise-proposal" className="font-bold text-[#173d40] hover:underline">
+                      request volume pricing
+                    </a>
+                    .
+                  </p>
+                </div>
+              ) : (
+                <div className="animate-fade-in">
+                  <div className="flex justify-between items-center mb-1 gap-2">
+                    <label htmlFor="hero-words" className="text-xs font-bold text-slate-700">
+                      Total Word Count
+                    </label>
+                    <span className="text-xs text-slate-500 font-medium">
+                      ${PRICING.standardMinimum.toFixed(2)} minimum order
+                    </span>
+                  </div>
+                  <input
+                    id="hero-words"
+                    type="number"
+                    inputMode="numeric"
+                    min={50}
+                    step={50}
+                    value={wordCount}
+                    onChange={(e) => setWordCount(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                    className={`${inputClass} no-spinner text-center font-bold text-base`}
+                  />
+                </div>
+              )}
+
+              {/* Add-ons */}
+              <div className="space-y-2 pt-2 border-t border-slate-100">
+                {ADD_ONS.map((addOn) => {
+                  const [checked, setChecked] = addOnState[addOn.key];
+                  return (
+                    <label
+                      key={addOn.key}
+                      className={`flex items-start justify-between gap-3 p-3 rounded-lg border cursor-pointer transition-colors text-xs ${
+                        checked ? "border-teal-400 bg-teal-50/60" : "border-slate-200 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => setChecked(e.target.checked)}
+                          className="w-4 h-4 mt-px flex-shrink-0 accent-[#173d40] rounded"
+                        />
+                        <span className="font-semibold text-slate-800 leading-snug">{addOn.label}</span>
+                      </span>
+                      <span className="font-bold text-slate-700 whitespace-nowrap">
+                        +${addOn.fee.toFixed(2)}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+
+              {/* Breakdown & total */}
+              <div className="pt-3 border-t border-slate-200 space-y-1.5">
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>Base Price</span>
+                  <span className="font-semibold text-slate-700">${price.basePrice.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>Add-ons</span>
+                  <span className="font-semibold text-slate-700">${price.addOnsPrice.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-500 pb-2">
+                  <span>Turnaround</span>
+                  <span className="font-bold text-[#173d40] flex items-center gap-1 text-right">
+                    <Clock className="w-3 h-3 flex-shrink-0" />
+                    {price.turnaround}
+                  </span>
+                </div>
+
+                <div className="flex items-end justify-between gap-3 pt-3 border-t border-slate-200 mb-3">
+                  <span className="text-xs text-slate-500">Total Quote Estimate</span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-[#173d40] leading-none">
+                    ${price.totalAmount.toFixed(2)}
+                  </span>
                 </div>
 
                 <button
@@ -270,8 +376,13 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({ onOpenOrder }) =
                   className="w-full bg-[#173d40] hover:bg-[#123032] text-white font-extrabold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-98"
                 >
                   Start Order Now
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4" strokeWidth={2.25} />
                 </button>
+
+                <p className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 pt-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                  No account required • Pay only when you confirm
+                </p>
               </div>
             </div>
           </div>

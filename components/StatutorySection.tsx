@@ -1,87 +1,177 @@
+"use client";
+
 import React from "react";
-import { ShieldCheck, Award } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
+import { SITE } from "@/lib/site";
+import {
+  SectionHeading,
+  SECTION_PADDING,
+  SECTION_FOOTNOTE_GAP,
+} from "@/components/ui/SectionHeading";
 
 interface StatutorySectionProps {
   onOpenOrder: () => void;
 }
 
 const ORGANIZATIONS = [
-  { code: "USCIS", name: "USCIS", scope: "N-400, I-485, I-130 Petitions, Asylum & SIV Filings", tag: "100% Guaranteed" },
-  { code: "DOS", name: "U.S. Dept of State", scope: "Passport Agencies, Consulates & Visa Applications", tag: "Federal Standard" },
-  { code: "UN", name: "United Nations", scope: "Diplomatic Submissions & Multilateral Missions", tag: "Institutional Grade" },
-  { code: "UNICEF", name: "UNICEF", scope: "Global Field Operations & Official Program Records", tag: "Humanitarian Partner" },
-  { code: "WB", name: "The World Bank Group", scope: "Financial Audits, Contracts & Legal Directives", tag: "Institutional Standard" },
-  { code: "COURTS", name: "Federal & State Courts", scope: "Affidavits, Depositions, Contracts & Exhibits", tag: "Evidentiary Standard" },
-  { code: "SSA", name: "Social Security Admin (SSA)", scope: "Birth Records, Identity & Survivor Benefit Proofs", tag: "Federal Acceptance" },
-  { code: "DMV", name: "State DMVs Nationwide", scope: "Foreign Driver's Licenses & ID Verifications", tag: "Real-ID Compliant" },
-  { code: "HEALTH", name: "Hospitals & Medical Institutions", scope: "Patient Records, Summaries & Immunizations", tag: "Clinical Grade" },
-  { code: "WHO", name: "World Health Organization", scope: "Clinical Registry Translations & Health Guidelines", tag: "Global Health" },
+  {
+    code: "USCIS",
+    name: "U.S. Citizenship & Immigration Services",
+    scope: "N-400 Naturalization, I-485 Adjustment of Status, I-130 Petitions, Asylum & SIV Cases",
+    tag: "100% Guaranteed",
+  },
+  {
+    code: "U.S. STATE DEPT",
+    name: "U.S. Department of State",
+    scope: "U.S. Passport Agencies, Consular Affairs, Foreign Visa Applications & DS-260 Filings",
+    tag: "Verified Acceptance",
+  },
+  {
+    code: "UNITED NATIONS",
+    name: "United Nations (UN)",
+    scope: "UN Secretariat, Peacekeeping Missions, Global Procurement & Diplomatic Submissions",
+    tag: "Official Acceptance",
+  },
+  {
+    code: "UNICEF",
+    name: "United Nations Children's Fund (UNICEF)",
+    scope: "Humanitarian Field Operations, Program Evaluation Reports & Official Records",
+    tag: "Trusted Partner",
+  },
+  {
+    code: "WORLD BANK",
+    name: "The World Bank Group",
+    scope: "Multilateral Project Documentation, Financial Audits, Contracts & Legal Directives",
+    tag: "Institutional Standard",
+  },
+  {
+    code: "U.S. COURTS",
+    name: "U.S. Federal & State Courts",
+    scope: "Affidavits, Depositions, Contracts, Evidence Exhibits & Family Court Decrees",
+    tag: "Evidentiary Standard",
+  },
+  {
+    code: "SSA",
+    name: "Social Security Administration (SSA)",
+    scope: "Birth Certificates, Foreign Marriage Records, Identity & Survivor Benefit Proofs",
+    tag: "Federal Acceptance",
+  },
+  {
+    code: "STATE DMVs",
+    name: "State DMVs Nationwide",
+    scope: "Foreign Driver's Licenses, International Permits, ID Verifications & Driving Records",
+    tag: "Real-ID Compliant",
+  },
+  {
+    code: "HEALTHCARE",
+    name: "Hospitals & Medical Institutions",
+    scope: "International Patient Records, Clinical Summaries, Immunization Cards & Medical Affidavits",
+    tag: "Clinical Grade",
+  },
+  {
+    code: "WHO",
+    name: "World Health Organization (WHO)",
+    scope: "International Health Guidelines, Clinical Registry Translations & Field Records",
+    tag: "Global Standards",
+  },
+];
+
+const COMPLIANCE_CHIPS = [
+  "USCIS (8 CFR 204.2 Compliant)",
+  "U.S. Dept of State & Consulates",
+  "WES & Academic Evaluation Boards",
+  "Federal & State Judicial Courts",
+  "State DMVs (Motor Vehicles)",
+  "Complying with ATA & ISO 17100",
 ];
 
 export const StatutorySection: React.FC<StatutorySectionProps> = ({ onOpenOrder }) => {
   return (
-    <section className="py-16 bg-white border-y border-slate-200" id="institutions">
+    <section className={`${SECTION_PADDING} bg-white border-y border-slate-200`} id="institutions">
       <div className="max-w-7xl mx-auto px-4">
-        
+
         {/* ATA Membership Banner */}
-        <div className="bg-gradient-to-r from-slate-50 via-teal-50/40 to-slate-50 border-2 border-[#002D62] border-l-8 rounded-xl p-6 mb-12 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[#002D62] text-white flex items-center justify-center font-extrabold text-xl shadow-md flex-shrink-0">
-              ATA
+        <div
+          className="bg-gradient-to-r from-slate-50 via-teal-50/40 to-slate-50 border-2 border-[#002D62] border-l-4 sm:border-l-8 rounded-xl p-5 sm:p-6 mb-12 sm:mb-14 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6"
+          id="accreditation"
+        >
+          <div className="flex items-start sm:items-center gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#002D62] text-white flex flex-col items-center justify-center shadow-md flex-shrink-0 leading-none">
+              <span className="font-extrabold text-sm sm:text-base">ATA</span>
+              <span className="text-[7px] font-bold tracking-widest mt-0.5">MEMBER</span>
             </div>
             <div>
               <span className="text-xs font-extrabold uppercase tracking-widest text-[#b45309] block">
                 Official Corporate Member
               </span>
-              <h4 className="text-lg font-bold text-[#002D62]">
-                American Translators Association (ATA Member #274819)
-              </h4>
-              <p className="text-xs text-slate-600 mt-0.5">
-                Every certified translation includes our official corporate seal, authorized officer signature under penalty of perjury, and Certificate of Accuracy.
+              <h3 className="text-base sm:text-lg font-bold text-[#002D62]">
+                American Translators Association (ATA)
+              </h3>
+              <p className="text-[11px] font-semibold text-slate-500 mt-0.5">
+                Corporate Membership #{SITE.ataMemberNumber} • Active &amp; Verified Standing
+              </p>
+              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                {SITE.name} translates and certifies all foreign documents under strict adherence to{" "}
+                <strong className="text-slate-800">ATA Standards for Translation and Certification</strong>. Every document includes our corporate seal, accredited translator certification, and sworn Statement of Accuracy fulfilling{" "}
+                <strong className="text-slate-800">8 CFR 204.2(a)(1)(iii)</strong>.
               </p>
             </div>
           </div>
           <button
             onClick={onOpenOrder}
-            className="px-4 py-2 rounded-lg bg-[#002D62] text-white font-bold text-xs uppercase tracking-wider hover:bg-blue-900 transition-colors flex-shrink-0"
+            className="w-full md:w-auto px-4 py-2.5 rounded-lg bg-[#002D62] text-white font-bold text-xs uppercase tracking-wider hover:bg-blue-900 transition-colors flex-shrink-0 inline-flex items-center justify-center gap-2"
           >
-            Verify Credentials
+            <BadgeCheck className="w-4 h-4" />
+            Start Certified Order
           </button>
         </div>
 
         {/* 10 Executive Recognition Cards */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <span className="text-xs font-bold text-[#173d40] uppercase tracking-wider bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
-            Statutory &amp; Institutional Acceptance
-          </span>
-          <h2 className="text-3xl font-extrabold text-slate-900 mt-3">
-            Recognized by Government, Judicial &amp; Healthcare Authorities
-          </h2>
-          <p className="text-slate-600 text-sm mt-2">
-            Our format-engineered certified translations strictly meet federal, state, and international evidentiary standards.
-          </p>
-        </div>
+        <SectionHeading
+          eyebrow="Statutory & Institutional Recognition"
+          title="Official Acceptance Guarantee Across Regulatory Bodies & Institutions"
+          description="Our certified and notarized translations hold a 100% acceptance record across federal agencies, top universities, medical networks, and global institutions."
+        />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {ORGANIZATIONS.map((org, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          {ORGANIZATIONS.map((org) => (
             <div
-              key={idx}
-              className="bg-slate-50 hover:bg-white border border-slate-200 hover:border-teal-400 p-4 rounded-xl shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+              key={org.code}
+              className="bg-slate-50 hover:bg-white border border-slate-200 hover:border-teal-300 p-5 rounded-2xl shadow-2xs hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
             >
-              <div>
-                <div className="flex items-center justify-between gap-1 mb-2">
-                  <span className="font-extrabold text-[11px] text-[#173d40] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                    {org.code}
-                  </span>
-                  <span className="text-[10px] text-emerald-700 font-bold">
-                    {org.tag}
-                  </span>
-                </div>
-                <h4 className="font-bold text-sm text-slate-900 mb-1">{org.name}</h4>
-                <p className="text-xs text-slate-500 leading-snug">{org.scope}</p>
+              <div className="flex items-center justify-between gap-1.5 mb-2 flex-wrap">
+                <span className="font-extrabold text-[10px] text-[#173d40] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                  {org.code}
+                </span>
+                <span className="text-[10px] text-emerald-700 font-bold whitespace-nowrap">✓ {org.tag}</span>
               </div>
+              <h3 className="font-bold text-sm text-slate-900 mb-1 leading-snug">{org.name}</h3>
+              <p className="text-xs text-slate-500 leading-snug">{org.scope}</p>
             </div>
           ))}
+        </div>
+
+        <ul className="flex flex-wrap justify-center gap-2 mt-10">
+          {COMPLIANCE_CHIPS.map((chip) => (
+            <li
+              key={chip}
+              className="text-[11px] font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full"
+            >
+              {chip}
+            </li>
+          ))}
+        </ul>
+
+        <div className={`${SECTION_FOOTNOTE_GAP} text-center`}>
+          <p className="text-sm text-slate-600">
+            Need your documents certified for USCIS, universities, courts, or government bodies?{" "}
+            <button
+              onClick={onOpenOrder}
+              className="font-extrabold text-[#173d40] underline underline-offset-4 hover:text-[#f59e0b] transition-colors"
+            >
+              Start Order Now
+            </button>
+          </p>
         </div>
 
       </div>

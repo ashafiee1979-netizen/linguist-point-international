@@ -13,8 +13,10 @@ export const POPULAR_LANGUAGES: LanguageOption[] = [
   { code: 'ar', name: 'Arabic', flag: 'sa', isPopular: true },
 ];
 
-export const ALL_LANGUAGES: LanguageOption[] = [
-  ...POPULAR_LANGUAGES,
+// Languages outside the popular shortlist, alphabetical. Kept separate so the
+// dropdowns can show a "Popular" optgroup without repeating the same entries
+// again under "All Languages".
+export const OTHER_LANGUAGES: LanguageOption[] = [
   { code: 'af', name: 'Afrikaans', flag: 'za' },
   { code: 'sq', name: 'Albanian', flag: 'al' },
   { code: 'am', name: 'Amharic', flag: 'et' },
@@ -83,4 +85,9 @@ export const ALL_LANGUAGES: LanguageOption[] = [
   { code: 'vi', name: 'Vietnamese', flag: 'vn' },
   { code: 'cy', name: 'Welsh', flag: 'gb' },
   { code: 'yi', name: 'Yiddish', flag: 'il' },
+];
+
+export const ALL_LANGUAGES: LanguageOption[] = [
+  ...POPULAR_LANGUAGES,
+  ...OTHER_LANGUAGES,
 ];

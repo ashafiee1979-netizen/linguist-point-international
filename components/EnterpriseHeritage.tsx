@@ -1,5 +1,9 @@
 import React from "react";
-import { Building2, Globe2 } from "lucide-react";
+import {
+  SectionHeading,
+  SECTION_PADDING,
+  SECTION_FOOTNOTE_GAP,
+} from "@/components/ui/SectionHeading";
 
 interface ClientLogo {
   name: string;
@@ -21,24 +25,24 @@ const PARTNER_CLIENTS: ClientLogo[] = [
 
 export const EnterpriseHeritage: React.FC = () => {
   return (
-    <section className="py-16 bg-slate-50 border-b border-slate-200" id="heritage">
+    <section className={`${SECTION_PADDING} bg-slate-50 border-b border-slate-200`} id="heritage">
       <div className="max-w-7xl mx-auto px-4">
         
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-xs font-bold text-[#b45309] uppercase tracking-wider bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-14">
+          <span className="inline-block text-[11px] sm:text-xs font-bold text-[#b45309] uppercase tracking-[0.12em] bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-200">
             Enterprise Heritage
           </span>
-          <h2 className="text-3xl font-extrabold text-slate-900 mt-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-[2.125rem] font-extrabold text-slate-900 mt-4 leading-[1.2]">
             Backed by Strategic Multilateral Pedigree
           </h2>
-          <p className="text-slate-600 text-sm mt-2">
+          <p className="text-slate-600 text-sm sm:text-[15px] leading-relaxed mt-3.5">
             Linguist Point International is backed by the proven track record of <strong>PUL Global Partners</strong> and <strong>PUL Consulting Services</strong>—trusted leaders delivering mission-critical translation and interpretation to premier international institutions.
           </p>
         </div>
 
         {/* 2 Parent Partner Entities */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 mb-10 sm:mb-12">
+          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center text-center sm:text-left gap-5">
             <div className="w-24 h-24 flex-shrink-0 flex items-center justify-center p-2 bg-slate-50 rounded-xl border border-slate-100">
               <img src="/assets/pul-global-partners.png" alt="PUL Global Partners" className="max-h-16 w-auto object-contain" />
             </div>
@@ -46,14 +50,14 @@ export const EnterpriseHeritage: React.FC = () => {
               <span className="text-[11px] font-extrabold uppercase text-[#173d40] bg-teal-50 px-2 py-0.5 rounded">
                 Strategic Parent Partner
               </span>
-              <h4 className="text-base font-bold text-slate-900 mt-1">PUL Global Partners</h4>
+              <h3 className="text-base font-bold text-slate-900 mt-1">PUL Global Partners</h3>
               <p className="text-xs text-slate-600 mt-1">
                 Directing international public-sector partnerships, bilateral missions, and complex cross-border translation operations with strict regulatory oversight and NDA compliance.
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-5">
+          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center text-center sm:text-left gap-5">
             <div className="w-24 h-24 flex-shrink-0 flex items-center justify-center p-2 bg-slate-50 rounded-xl border border-slate-100">
               <img src="/assets/pul-consulting.jpg" alt="PUL Consulting Services" className="max-h-16 w-auto object-contain rounded" />
             </div>
@@ -61,7 +65,7 @@ export const EnterpriseHeritage: React.FC = () => {
               <span className="text-[11px] font-extrabold uppercase text-[#173d40] bg-teal-50 px-2 py-0.5 rounded">
                 Strategic Parent Partner
               </span>
-              <h4 className="text-base font-bold text-slate-900 mt-1">PUL Consulting Services</h4>
+              <h3 className="text-base font-bold text-slate-900 mt-1">PUL Consulting Services</h3>
               <p className="text-xs text-slate-600 mt-1">
                 Over 14 years of institutional management, capacity building, and mission-critical translation &amp; interpretation for top prime contractors and multilateral entities.
               </p>
@@ -70,17 +74,17 @@ export const EnterpriseHeritage: React.FC = () => {
         </div>
 
         {/* Key Client Logos Showcase (Watermark Hover Bloom) */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-8 shadow-sm">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 text-center sm:text-left">
               Key Institutions Served with Enterprise Translation &amp; Interpretation
-            </h4>
-            <span className="text-[11px] font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+            </h3>
+            <span className="hidden sm:inline-block text-[11px] font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200 whitespace-nowrap">
               Hover over logos to view in full color
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {PARTNER_CLIENTS.map((client, idx) => (
               <div
                 key={idx}
