@@ -1,0 +1,107 @@
+// PostgreSQL Schema definition for Linguist Point International
+// Configured for direct migration to Neon Serverless PostgreSQL
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_TRANSLATION
+  QUALITY_REVIEW
+  COMPLETED
+  DELIVERED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  REFUNDED
+}
+
+model Order {
+  id              String         @id @default(cuid())
+  orderNumber     String         @unique // e.g. "LP-2026-0814"
+  clientName      String
+  clientEmail     String
+  clientPhone     String?
+  sourceLanguage  String
+  targetLanguage  String
+  pageCount       Int            @default(1)
+  wordCount       Int?
+  serviceTier     String         @default("CERTIFIED") // CERTIFIED, NOTARIZED, ENTERPRISE
+  
+  // Add-on options
+  isRush12Hour    Boolean        @default(false)
+  isNotarized     Boolean        @default(false)
+  isHardCopyMail  Boolean        @default(false)
+  
+  // Financials
+  subtotal        Decimal        @db.Decimal(10, 2)
+  totalAmount     Decimal        @db.Decimal(10, 2)
+  currency        String         @default("USD")
+  paymentStatus   PaymentStatus  @default(UNPAID)
+  orderStatus     OrderStatus    @default(PENDING)
+  
+  // Delivery notes
+  specialInstructions String?    @db.Text
+  trackingNumber      String?
+  
+  // File Relations
+  files           OrderFile[]
+  
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([clientEmail])
+  @@index([orderNumber])
+}
+
+model OrderFile {
+  id              String         @id @default(cuid())
+  orderId         String
+  order           Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  originalName    String
+  fileSize        Int
+  mimeType        String
+  storageUrl      String         // Cloud storage path (S3/GCP/One.com Vault)
+  isSourceDoc     Boolean        @default(true) // true = client upload, false = translated deliverable
+  uploadedAt      DateTime       @default(now())
+
+  @@index([orderId])
+}
+
+model Review {
+  id              String         @id @default(cuid())
+  clientName      String
+  initials        String
+  location        String?
+  languagePair    String
+  useCase         String?
+  rating          Int            @default(5)
+  comments        String         @db.Text
+  isVerified      Boolean        @default(true)
+  isApproved      Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+
+  @@index([rating])
+}
+
+model RfpInquiry {
+  id              String         @id @default(cuid())
+  contactName     String
+  corporateEmail  String
+  phone           String
+  preferredTime   String?
+  volumeScope     String?
+  targetLanguages String?
+  projectNotes    String?        @db.Text
+  createdAt       DateTime       @default(now())
+}

@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #173d40;
+  --primary-hover: #123032;
+  --primary-light: #e6fffa;
+  --primary-glow: rgba(23, 61, 64, 0.15);
+  --secondary: #0f172a;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+}
+
+body {
+  color: #334155;
+  background-color: #ffffff;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Watermark logo hover transition */
+.watermark-logo {
+  filter: grayscale(100%) contrast(85%);
+  opacity: 0.38;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.watermark-box:hover .watermark-logo {
+  filter: grayscale(0%) contrast(100%);
+  opacity: 1;
+  transform: scale(1.08);
+}
