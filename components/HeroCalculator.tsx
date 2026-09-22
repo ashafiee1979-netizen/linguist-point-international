@@ -106,7 +106,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
   );
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50 pt-4 pb-12 sm:pt-6 sm:pb-16 lg:pt-8 lg:pb-16 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50 pt-12 sm:pt-14 lg:pt-[70px] pb-12 sm:pb-16 lg:pb-16 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
         {/* Left Column: Value Proposition */}
@@ -165,12 +165,12 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
 
         {/* Right Column: Instant Live Order Calculator */}
         <div className="lg:col-span-5 w-full" id="order">
-          <div className={`bg-white rounded-2xl border p-6 sm:p-8 shadow-xl relative transition-all duration-300 ${
+          <div className={`bg-white rounded-2xl border p-5 sm:p-6 shadow-xl relative transition-all duration-300 ${
             isHighlighted
               ? "border-[#173d40] ring-4 ring-[#173d40]/25 shadow-2xl scale-[1.01]"
               : "border-slate-200 shadow-slate-900/5"
           }`}>
-            <div className="border-b border-slate-100 pb-4 mb-5">
+            <div className="border-b border-slate-100 pb-2.5 mb-3.5">
               <span className="text-xs font-extrabold uppercase tracking-wider text-[#173d40]">
                 Instant Cost Builder
               </span>
@@ -179,7 +179,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
 
             {/* Service type toggle */}
             <div
-              className="grid grid-cols-2 gap-1 p-1.5 bg-slate-100 rounded-xl mb-5"
+              className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl mb-3.5"
               role="group"
               aria-label="Translation service type"
             >
@@ -196,7 +196,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
                     type="button"
                     onClick={() => onServiceTypeChange(option.type)}
                     aria-pressed={active}
-                    className={`px-3 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${
                       active
                         ? "bg-white text-[#173d40] shadow-sm"
                         : "text-slate-500 hover:text-slate-700"
@@ -211,9 +211,9 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
               })}
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-3.5">
               {/* Language Selection Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="hero-source" className={labelClass}>
                     Source Language
@@ -271,20 +271,20 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
               {/* Volume control: pages for certified, words for standard */}
               {serviceType === "certified" ? (
                 <div>
-                  <div className="flex justify-between items-center mb-2 gap-2">
+                  <div className="flex justify-between items-center mb-1.5 gap-2">
                     <label htmlFor="hero-pages" className="text-sm font-bold text-slate-700">
                       Page Count (250 words/page)
                     </label>
-                    <span className="text-xs font-extrabold text-[#173d40] bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full">
+                    <span className="text-xs font-extrabold text-[#173d40] bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full">
                       {pageCount} {pageCount === 1 ? "Page" : "Pages"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     <button
                       type="button"
                       onClick={() => setPageCount(Math.max(1, pageCount - 1))}
                       disabled={pageCount <= 1}
-                      className="w-12 h-12 flex-shrink-0 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:hover:bg-white text-slate-800 font-extrabold text-xl shadow-xs transition-all flex items-center justify-center"
+                      className="w-10 h-10 flex-shrink-0 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:hover:bg-white text-slate-800 font-extrabold text-xl shadow-xs transition-all flex items-center justify-center"
                       aria-label="Decrease page count"
                     >
                       −
@@ -296,20 +296,20 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
                       max={SLIDER_MAX}
                       value={Math.min(pageCount, SLIDER_MAX)}
                       onChange={(e) => setPageCount(parseInt(e.target.value, 10))}
-                      className="flex-grow min-w-0 h-2.5 accent-[#173d40] cursor-pointer"
+                      className="flex-grow min-w-0 h-2 accent-[#173d40] cursor-pointer"
                       aria-label="Page count"
                     />
                     <button
                       type="button"
                       onClick={() => setPageCount(Math.min(PRICING.maxPages, pageCount + 1))}
                       disabled={pageCount >= PRICING.maxPages}
-                      className="w-12 h-12 flex-shrink-0 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:hover:bg-white text-slate-800 font-extrabold text-xl shadow-xs transition-all flex items-center justify-center"
+                      className="w-10 h-10 flex-shrink-0 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 disabled:opacity-40 disabled:hover:bg-white text-slate-800 font-extrabold text-xl shadow-xs transition-all flex items-center justify-center"
                       aria-label="Increase page count"
                     >
                       +
                     </button>
                   </div>
-                  <p className="text-xs text-slate-500 mt-2">
+                  <p className="text-xs text-slate-500 mt-1">
                     More than {SLIDER_MAX} pages? Use +, or{" "}
                     <a href="#enterprise-proposal" className="font-bold text-[#173d40] hover:underline">
                       request volume pricing
@@ -341,17 +341,17 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
               )}
 
               {/* Add-ons */}
-              <div className="space-y-2.5 pt-2 border-t border-slate-100">
+              <div className="space-y-2 pt-2 border-t border-slate-100">
                 {ADD_ONS.map((addOn) => {
                   const [checked, setChecked] = addOnState[addOn.key];
                   return (
                     <label
                       key={addOn.key}
-                      className={`flex items-start justify-between gap-3 p-3.5 rounded-xl border cursor-pointer transition-colors text-sm ${
+                      className={`flex items-start justify-between gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-colors text-sm ${
                         checked ? "border-teal-500 bg-teal-50/70 shadow-xs" : "border-slate-200 hover:bg-slate-50"
                       }`}
                     >
-                      <span className="flex items-start gap-2.5">
+                      <span className="flex items-start gap-2">
                         <input
                           type="checkbox"
                           checked={checked}
@@ -369,7 +369,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
               </div>
 
               {/* Breakdown & total */}
-              <div className="pt-4 border-t border-slate-200 space-y-2">
+              <div className="pt-2.5 border-t border-slate-200 space-y-1.5">
                 <div className="flex justify-between text-sm text-slate-600">
                   <span>Base Price</span>
                   <span className="font-semibold text-slate-800">${price.basePrice.toFixed(2)}</span>
@@ -378,7 +378,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
                   <span>Add-ons</span>
                   <span className="font-semibold text-slate-800">${price.addOnsPrice.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm text-slate-600 pb-2">
+                <div className="flex justify-between text-sm text-slate-600 pb-1">
                   <span>Turnaround</span>
                   <span className="font-bold text-[#173d40] flex items-center gap-1 text-right">
                     <Clock className="w-3.5 h-3.5 flex-shrink-0" />
@@ -386,7 +386,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
                   </span>
                 </div>
 
-                <div className="flex items-end justify-between gap-3 pt-3.5 border-t border-slate-200 mb-3">
+                <div className="flex items-end justify-between gap-3 pt-2.5 border-t border-slate-200 mb-2.5">
                   <span className="text-sm font-medium text-slate-600">Total Quote Estimate</span>
                   <span className="text-3xl sm:text-4xl font-extrabold text-[#173d40] leading-none">
                     ${price.totalAmount.toFixed(2)}
@@ -395,13 +395,13 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
 
                 <button
                   onClick={handleStartOrder}
-                  className="w-full bg-[#173d40] hover:bg-[#123032] text-white font-extrabold text-base py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-98"
+                  className="w-full bg-[#173d40] hover:bg-[#123032] text-white font-extrabold text-base py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-98"
                 >
                   Start Order Now
                   <ArrowRight className="w-4 h-4" strokeWidth={2.25} />
                 </button>
 
-                <p className="flex items-center justify-center gap-1.5 text-xs text-slate-500 pt-2">
+                <p className="flex items-center justify-center gap-1.5 text-xs text-slate-500 pt-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                   No account required • Pay only when you confirm
                 </p>
