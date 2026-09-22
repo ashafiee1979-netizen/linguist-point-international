@@ -253,27 +253,27 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder, onS
             </button>
           </div>
 
-          <div className="mt-6 pt-5 border-t border-slate-200">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+          <div className="mt-6 pt-5 border-t border-slate-200 text-center">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-center gap-x-3 gap-y-1 mb-3.5 text-center">
               <h3 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider">
                 Popular Languages (Translated to English)
               </h3>
+              <span className="hidden sm:inline text-slate-300" aria-hidden="true">•</span>
               <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
                 Click any language to auto-populate quote
               </span>
             </div>
 
-            {/* Single Row: All Popular Languages */}
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 pt-0.5">
+            {/* Single Row: Centered with equal spacing on both sides */}
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1 pt-0.5">
               {POPULAR_LANGUAGES.map((item) => (
                 <button
                   key={item.pair}
                   onClick={() => handleRouteLanguage(item.name, "English")}
-                  className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3.5 py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 flex-shrink-0"
+                  className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1 flex-shrink-0"
                   title={`Order ${item.name} to English translation`}
                 >
                   <span>{item.name}</span>
-                  <span className="text-[11px] font-normal text-slate-400">→ EN</span>
                 </button>
               ))}
             </div>
