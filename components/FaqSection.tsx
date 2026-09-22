@@ -133,16 +133,16 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ onOpenOrder }) => {
                     aria-expanded={isOpen}
                     aria-controls={`faq-panel-${idx}`}
                     id={`faq-trigger-${idx}`}
-                    className="w-full p-5 text-left flex items-start justify-between gap-4 font-bold text-sm text-slate-800 hover:text-[#173d40] transition-colors"
+                    className="w-full p-5 sm:p-6 text-left flex items-start justify-between gap-4 font-bold text-base sm:text-lg text-slate-900 hover:text-[#173d40] transition-colors"
                   >
-                    <span className="flex items-start gap-2.5">
+                    <span className="flex items-start gap-3">
                       <span className="text-[#173d40]/40 font-extrabold tabular-nums flex-shrink-0">
                         {idx + 1}.
                       </span>
                       <span>{item.q}</span>
                     </span>
                     <span
-                      className={`flex-shrink-0 w-7 h-7 rounded-full border flex items-center justify-center transition-all duration-200 ${
+                      className={`flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-200 ${
                         isOpen
                           ? "bg-[#173d40] border-[#173d40] text-white rotate-180"
                           : "bg-white border-slate-200 text-slate-400"
@@ -158,7 +158,7 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ onOpenOrder }) => {
                     id={`faq-panel-${idx}`}
                     role="region"
                     aria-labelledby={`faq-trigger-${idx}`}
-                    className="px-5 pb-5 text-[13px] text-slate-600 leading-relaxed border-t border-slate-100 pt-4 animate-accordion-down"
+                    className="px-5 sm:px-6 pb-6 text-sm sm:text-base text-slate-600 leading-relaxed border-t border-slate-100 pt-4 animate-accordion-down"
                   >
                     {item.a}
                   </div>
@@ -169,7 +169,7 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ onOpenOrder }) => {
         </div>
 
         <div className={`${SECTION_FOOTNOTE_GAP} text-center`}>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm sm:text-base text-slate-600">
             Have documents ready for official certification? Standard delivery in 24 hours.{" "}
             <button
               onClick={onOpenOrder}

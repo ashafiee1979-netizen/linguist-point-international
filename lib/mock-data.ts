@@ -1,5 +1,6 @@
 export interface ReviewMock {
   id: string;
+  orderNumber?: string;
   clientName: string;
   initials: string;
   location: string;
@@ -8,6 +9,8 @@ export interface ReviewMock {
   rating: number;
   comments: string;
   dateAgo: string;
+  isVerified?: boolean;
+  isApproved?: boolean;
 }
 
 export const INITIAL_REVIEWS: ReviewMock[] = [
@@ -71,7 +74,7 @@ export const INITIAL_REVIEWS: ReviewMock[] = [
     clientName: 'Ahmad Karimi',
     initials: 'AK',
     location: 'Washington, DC',
-    languagePair: 'Dari & Pashto to English',
+    languagePair: 'Dari to English',
     useCase: 'Special Immigrant Visa (SIV) Case',
     rating: 5,
     comments: 'Our immigration law firm relies on Linguist Point for Dari and Pashto translations. Their legal accuracy, fast delivery, and USCIS-compliant certification make them our #1 trusted partner.',

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Stamp, Scale, GraduationCap } from "lucide-react";
+import { Landmark, Scale, GraduationCap } from "lucide-react";
 import { IconTile } from "@/components/ui/IconTile";
 import {
   SectionHeading,
@@ -15,7 +15,7 @@ interface IndustriesSectionProps {
 
 const INDUSTRIES = [
   {
-    icon: Stamp,
+    icon: Landmark,
     title: "Immigration & USCIS",
     body: "Certified translations format-matched to satisfy USCIS, NVC, consular, and adjustment of status petitions.",
     documents: ["Birth Certificate", "Marriage License", "Asylum Declaration", "Police Clearance"],
@@ -50,16 +50,16 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onOpenOrde
             return (
               <div
                 key={industry.title}
-                className="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm hover:border-teal-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
+                className="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm hover:border-teal-400 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col"
               >
-                <IconTile icon={Icon} size="lg" tone="light" className="mb-5" />
-                <h3 className="text-[15px] font-bold text-slate-900">{industry.title}</h3>
-                <p className="text-[13px] text-slate-600 leading-relaxed mt-2 flex-grow">{industry.body}</p>
-                <ul className="flex flex-wrap gap-1.5 mt-5 pt-5 border-t border-slate-100">
+                <IconTile icon={Icon} size="xl" tone="brand" className="mb-5" />
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">{industry.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed mt-2.5 flex-grow">{industry.body}</p>
+                <ul className="flex flex-wrap gap-2 mt-5 pt-5 border-t border-slate-100">
                   {industry.documents.map((doc) => (
                     <li
                       key={doc}
-                      className="text-[11px] font-semibold text-[#173d40] bg-slate-50 border border-slate-200 px-2 py-1 rounded-md"
+                      className="text-xs font-semibold text-[#173d40] bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md"
                     >
                       {doc}
                     </li>
@@ -71,7 +71,7 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onOpenOrde
         </div>
 
         <div className={`${SECTION_FOOTNOTE_GAP} text-center`}>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm sm:text-base text-slate-600">
             Need specialized sector translation for immigration, courts, or university admissions?{" "}
             <button
               onClick={onOpenOrder}

@@ -16,6 +16,7 @@ import { ReviewSection } from "@/components/ReviewSection";
 import { FaqSection } from "@/components/FaqSection";
 import { Footer } from "@/components/Footer";
 import { OrderModal } from "@/components/OrderModal";
+import { ChatConcierge } from "@/components/ChatConcierge";
 import type { OrderDraft } from "@/lib/order";
 import type { ServiceType } from "@/lib/pricing";
 
@@ -24,16 +25,33 @@ export default function Home() {
   const [modalInitialData, setModalInitialData] = useState<Partial<OrderDraft> | null>(null);
   // Owned here so the pricing cards can switch the hero calculator's mode.
   const [serviceType, setServiceType] = useState<ServiceType>("certified");
+  const [sourceLang, setSourceLang] = useState<string>("");
+  const [targetLang, setTargetLang] = useState<string>("English");
+  const [isOrderHighlighted, setIsOrderHighlighted] = useState(false);
 
   const handleOpenOrder = (data?: Partial<OrderDraft>) => {
-    setModalInitialData(data ?? { serviceType });
+    setModalInitialData(data ?? { serviceType, sourceLang, targetLang });
     setIsOrderModalOpen(true);
+  };
+
+  // When clicking popular languages, direct user to the main ordering section with pre-filled language.
+  const handleSelectLanguage = (src: string, tgt = "English") => {
+    setSourceLang(src);
+    setTargetLang(tgt);
+    setIsOrderHighlighted(true);
+    const orderElem = document.getElementById("order");
+    if (orderElem) {
+      orderElem.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    setTimeout(() => {
+      setIsOrderHighlighted(false);
+    }, 2200);
   };
 
   // The pricing cards both set the calculator's mode and open checkout in it.
   const handleOrderServiceType = (type: ServiceType) => {
     setServiceType(type);
-    setModalInitialData({ serviceType: type });
+    setModalInitialData({ serviceType: type, sourceLang, targetLang });
     setIsOrderModalOpen(true);
   };
 
@@ -50,6 +68,9 @@ export default function Home() {
         onOpenOrder={handleOpenOrder}
         serviceType={serviceType}
         onServiceTypeChange={setServiceType}
+        externalSourceLang={sourceLang}
+        externalTargetLang={targetLang}
+        isHighlighted={isOrderHighlighted}
       />
 
       {/* 4. Trust Bar */}
@@ -62,7 +83,10 @@ export default function Home() {
       <HowItWorks onOpenOrder={() => handleOpenOrder()} />
 
       {/* 7. Language Availability Lookup */}
-      <LanguageLookup onOpenOrder={handleOpenOrder} />
+      <LanguageLookup
+        onOpenOrder={handleOpenOrder}
+        onSelectLanguage={handleSelectLanguage}
+      />
 
       {/* 8. Specialized Industry Solutions */}
       <IndustriesSection onOpenOrder={() => handleOpenOrder()} />
@@ -116,6 +140,12 @@ export default function Home() {
         isOpen={isOrderModalOpen}
         onClose={() => setIsOrderModalOpen(false)}
         initialData={modalInitialData}
+      />
+
+      {/* 17. 24/7 AI Sales & Order Concierge */}
+      <ChatConcierge
+        onOpenOrder={handleOpenOrder}
+        onSelectLanguage={handleSelectLanguage}
       />
     </main>
   );

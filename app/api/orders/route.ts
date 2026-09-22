@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { calculatePrice, PRICING } from "@/lib/pricing";
 import type { ServiceType } from "@/lib/pricing";
+import { registerOrder } from "@/lib/review-store";
 
 const asString = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
 
@@ -73,6 +74,15 @@ export async function POST(request: Request) {
       orderStatus: "PENDING",
       createdAt: new Date().toISOString(),
     };
+
+    registerOrder({
+      orderNumber: orderRecord.orderNumber,
+      clientEmail: orderRecord.clientEmail,
+      clientName: orderRecord.clientName,
+      sourceLanguage: orderRecord.sourceLanguage,
+      targetLanguage: orderRecord.targetLanguage,
+      serviceType: orderRecord.serviceType,
+    });
 
     return NextResponse.json({
       success: true,

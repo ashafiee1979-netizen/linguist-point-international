@@ -1,7 +1,7 @@
 import React from "react";
 
 type Tone = "brand" | "light" | "gold" | "inverse";
-type Size = "sm" | "md" | "lg";
+type Size = "sm" | "md" | "lg" | "xl";
 
 interface IconTileProps {
   icon: React.ElementType;
@@ -27,6 +27,7 @@ const SIZES: Record<Size, { box: string; icon: string; stroke: number }> = {
   sm: { box: "w-9 h-9 rounded-lg", icon: "w-4 h-4", stroke: 2 },
   md: { box: "w-11 h-11 rounded-xl", icon: "w-[18px] h-[18px]", stroke: 1.9 },
   lg: { box: "w-14 h-14 rounded-2xl", icon: "w-6 h-6", stroke: 1.75 },
+  xl: { box: "w-16 h-16 rounded-2xl", icon: "w-8 h-8", stroke: 2 },
 };
 
 export const IconTile: React.FC<IconTileProps> = ({

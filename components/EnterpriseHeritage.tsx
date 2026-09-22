@@ -42,31 +42,47 @@ export const EnterpriseHeritage: React.FC = () => {
 
         {/* 2 Parent Partner Entities */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 mb-10 sm:mb-12">
-          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center text-center sm:text-left gap-5">
-            <div className="w-24 h-24 flex-shrink-0 flex items-center justify-center p-2 bg-slate-50 rounded-xl border border-slate-100">
-              <img src="/assets/pul-global-partners.png" alt="PUL Global Partners" className="max-h-16 w-auto object-contain" />
+          <div
+            className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center text-center sm:text-left gap-5"
+          >
+            <div className="w-full sm:w-56 h-24 flex-shrink-0 flex items-center justify-center p-3.5 bg-slate-50 rounded-xl border border-slate-100 shadow-2xs">
+              <img
+                src="/assets/pul-global-partners.png"
+                alt="PUL Global Partners"
+                className="max-h-16 max-w-[200px] w-auto h-auto object-contain"
+              />
             </div>
-            <div>
-              <span className="text-[11px] font-extrabold uppercase text-[#173d40] bg-teal-50 px-2 py-0.5 rounded">
+            <div className="flex flex-col flex-grow">
+              <span className="self-center sm:self-start text-[11px] font-extrabold uppercase tracking-wider text-[#173d40] bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded">
                 Strategic Parent Partner
               </span>
-              <h3 className="text-base font-bold text-slate-900 mt-1">PUL Global Partners</h3>
-              <p className="text-xs text-slate-600 mt-1">
+              <h3 className="text-lg font-bold text-slate-900 mt-1.5 flex items-center justify-center sm:justify-start gap-1.5">
+                PUL Global Partners
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
                 Directing international public-sector partnerships, bilateral missions, and complex cross-border translation operations with strict regulatory oversight and NDA compliance.
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center text-center sm:text-left gap-5">
-            <div className="w-24 h-24 flex-shrink-0 flex items-center justify-center p-2 bg-slate-50 rounded-xl border border-slate-100">
-              <img src="/assets/pul-consulting.jpg" alt="PUL Consulting Services" className="max-h-16 w-auto object-contain rounded" />
+          <div
+            className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center text-center sm:text-left gap-5"
+          >
+            <div className="w-full sm:w-56 h-24 flex-shrink-0 flex items-center justify-center p-3.5 bg-slate-50 rounded-xl border border-slate-100 shadow-2xs">
+              <img
+                src="/assets/pul-consulting.jpg"
+                alt="PUL Consulting Services"
+                className="max-h-16 max-w-[170px] w-auto h-auto object-contain rounded"
+              />
             </div>
-            <div>
-              <span className="text-[11px] font-extrabold uppercase text-[#173d40] bg-teal-50 px-2 py-0.5 rounded">
+            <div className="flex flex-col flex-grow">
+              <span className="self-center sm:self-start text-[11px] font-extrabold uppercase tracking-wider text-[#173d40] bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded">
                 Strategic Parent Partner
               </span>
-              <h3 className="text-base font-bold text-slate-900 mt-1">PUL Consulting Services</h3>
-              <p className="text-xs text-slate-600 mt-1">
+              <h3 className="text-lg font-bold text-slate-900 mt-1.5 flex items-center justify-center sm:justify-start gap-1.5">
+                PUL Consulting Services
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
                 Over 14 years of institutional management, capacity building, and mission-critical translation &amp; interpretation for top prime contractors and multilateral entities.
               </p>
             </div>
@@ -74,12 +90,12 @@ export const EnterpriseHeritage: React.FC = () => {
         </div>
 
         {/* Key Client Logos Showcase (Watermark Hover Bloom) */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-8 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 text-center sm:text-left">
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 text-center sm:text-left">
               Key Institutions Served with Enterprise Translation &amp; Interpretation
             </h3>
-            <span className="hidden sm:inline-block text-[11px] font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200 whitespace-nowrap">
+            <span className="hidden sm:inline-block text-xs font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200 whitespace-nowrap">
               Hover over logos to view in full color
             </span>
           </div>
@@ -88,7 +104,7 @@ export const EnterpriseHeritage: React.FC = () => {
             {PARTNER_CLIENTS.map((client, idx) => (
               <div
                 key={idx}
-                className="watermark-box bg-slate-50 hover:bg-white border border-slate-200 hover:border-teal-400 rounded-xl p-4 flex flex-col items-center justify-center min-h-[105px] transition-all cursor-pointer hover:shadow-md"
+                className="watermark-box bg-slate-50 hover:bg-white border border-slate-200 hover:border-teal-400 rounded-xl p-4 flex flex-col items-center justify-center min-h-[110px] transition-all cursor-pointer hover:shadow-md"
                 title={client.name}
               >
                 <div className="h-12 flex items-center justify-center w-full mb-2">
@@ -98,7 +114,7 @@ export const EnterpriseHeritage: React.FC = () => {
                     className={`watermark-logo ${client.widthClass || "max-w-[140px]"} ${client.heightClass || "max-h-[44px]"} object-contain`}
                   />
                 </div>
-                <span className="text-[11px] font-bold text-slate-500 text-center leading-tight">
+                <span className="text-xs font-bold text-slate-600 text-center leading-tight">
                   {client.name}
                 </span>
               </div>

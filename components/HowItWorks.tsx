@@ -63,8 +63,8 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenOrder }) => {
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-[15px] font-bold text-slate-900">{step.title}</h3>
-                  <p className="text-[13px] text-slate-600 leading-relaxed mt-2">{step.body}</p>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900">{step.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed mt-2.5">{step.body}</p>
                 </div>
               </li>
             );
@@ -72,7 +72,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenOrder }) => {
         </ol>
 
         <div className={`${SECTION_FOOTNOTE_GAP} text-center`}>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm sm:text-base text-slate-600">
             Ready to translate? Upload your files in 60 seconds and receive certified delivery within 24 hours.{" "}
             <button
               onClick={onOpenOrder}

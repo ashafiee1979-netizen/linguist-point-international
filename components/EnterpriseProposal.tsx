@@ -139,8 +139,8 @@ export const EnterpriseProposal: React.FC = () => {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <h3 className="text-lg font-extrabold text-slate-900">Request a Custom Proposal</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">Request a Custom Proposal</h3>
+                <p className="text-sm text-slate-600 mt-1">
                   Fill out your project parameters below to receive our custom quote and direct callback.
                 </p>
               </div>

@@ -46,18 +46,18 @@ const COLUMNS: FooterColumn[] = [
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-slate-900 text-slate-400 text-xs pt-12 sm:pt-16 pb-10 sm:pb-12 border-t border-slate-800">
+    <footer className="bg-slate-900 text-slate-400 text-sm pt-12 sm:pt-16 pb-10 sm:pb-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-10 sm:mb-12">
           {/* Brand Info */}
-          <div className="space-y-3 sm:col-span-2 lg:col-span-2">
-            <span className="text-white font-extrabold text-sm sm:text-base tracking-tight block">
+          <div className="space-y-3.5 sm:col-span-2 lg:col-span-2">
+            <span className="text-white font-extrabold text-base sm:text-lg tracking-tight block">
               LINGUIST POINT INTERNATIONAL
             </span>
-            <p className="text-slate-400 leading-relaxed text-xs max-w-sm">
+            <p className="text-slate-400 leading-relaxed text-sm max-w-sm">
               {SITE.name} is a premier translation agency delivering certified, legal, academic, and enterprise translations across {SITE.languageCount} languages with official regulatory compliance.
             </p>
-            <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 pt-1">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 pt-1">
               <span className="font-bold text-slate-300">ATA Member #{SITE.ataMemberNumber}</span>
               <span aria-hidden="true">•</span>
               <span className="font-bold text-slate-300">USCIS Approved</span>
@@ -66,15 +66,15 @@ export const Footer: React.FC = () => {
 
           {COLUMNS.map((column) => (
             <div key={column.heading}>
-              <h2 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
+              <h2 className="text-white font-bold text-sm uppercase tracking-wider mb-3.5">
                 {column.heading}
               </h2>
-              <ul className="space-y-1">
+              <ul className="space-y-1.5">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="inline-block py-1 hover:text-white transition-colors"
+                      className="inline-block py-0.5 text-slate-400 hover:text-white transition-colors"
                     >
                       {link.label}
                     </a>
@@ -86,29 +86,29 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Contact strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-6 border-t border-slate-800">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-6 border-t border-slate-800 text-sm">
           <a
             href={SITE.phoneHref}
-            className="flex items-center gap-2 text-white hover:text-[#f59e0b] transition-colors"
+            className="flex items-center gap-2 text-white hover:text-[#f59e0b] transition-colors font-medium"
           >
-            <Phone className="w-3.5 h-3.5 text-[#f59e0b] flex-shrink-0" />
+            <Phone className="w-4 h-4 text-[#f59e0b] flex-shrink-0" />
             {SITE.phone}
           </a>
           <a
             href={SITE.emailHref}
-            className="flex items-center gap-2 text-white hover:text-[#f59e0b] transition-colors break-all"
+            className="flex items-center gap-2 text-white hover:text-[#f59e0b] transition-colors break-all font-medium"
           >
-            <Mail className="w-3.5 h-3.5 text-[#f59e0b] flex-shrink-0" />
+            <Mail className="w-4 h-4 text-[#f59e0b] flex-shrink-0" />
             {SITE.email}
           </a>
-          <span className="flex items-center gap-2 text-slate-400">
-            <Clock className="w-3.5 h-3.5 text-[#f59e0b] flex-shrink-0" />
+          <span className="flex items-center gap-2 text-slate-300 font-medium">
+            <Clock className="w-4 h-4 text-[#f59e0b] flex-shrink-0" />
             24/7 Global Client Desk
           </span>
         </div>
 
-        <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
-          <div className="text-center sm:text-left">
+        <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          <div className="text-center sm:text-left text-slate-400">
             &copy; {new Date().getFullYear()} {SITE.name}. All Rights Reserved. Backed by PUL Global Partners.
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-slate-500">

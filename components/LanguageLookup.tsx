@@ -10,20 +10,28 @@ import type { OrderDraft } from "@/lib/order";
 
 interface LanguageLookupProps {
   onOpenOrder: (draft?: Partial<OrderDraft>) => void;
+  onSelectLanguage?: (sourceLang: string, targetLang?: string) => void;
 }
 
-const POPULAR_PAIRS = [
-  "Spanish to English",
-  "French to English",
-  "Ukrainian to English",
-  "Arabic to English",
-  "German to English",
-  "Chinese to English",
-  "Russian to English",
-  "Dari / Pashto to English",
+// Organized strictly by international recognition (UN official languages) and global speaker population
+const POPULAR_LANGUAGES_ROW_1 = [
+  { name: "Chinese", pair: "Chinese to English", code: "zh" },
+  { name: "Spanish", pair: "Spanish to English", code: "es" },
+  { name: "Hindi", pair: "Hindi to English", code: "hi" },
+  { name: "Arabic", pair: "Arabic to English", code: "ar" },
+  { name: "French", pair: "French to English", code: "fr" },
+  { name: "Russian", pair: "Russian to English", code: "ru" },
 ];
 
-export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder }) => {
+const POPULAR_LANGUAGES_ROW_2 = [
+  { name: "Urdu", pair: "Urdu to English", code: "ur" },
+  { name: "German", pair: "German to English", code: "de" },
+  { name: "Persian (Farsi)", pair: "Persian (Farsi) to English", code: "fa" },
+  { name: "Pashto", pair: "Pashto to English", code: "ps" },
+  { name: "Dari", pair: "Dari to English", code: "prs" },
+];
+
+export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder, onSelectLanguage }) => {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +48,14 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder }) =
   const hasQuery = query.trim().length > 0;
   const notFound = hasQuery && !resolved && matches.length === 0;
   const showList = isOpen && matches.length > 0;
+
+  const handleRouteLanguage = (source: string, target = "English") => {
+    if (onSelectLanguage) {
+      onSelectLanguage(source, target);
+    } else {
+      onOpenOrder({ sourceLang: source, targetLang: target });
+    }
+  };
 
   useEffect(
     () => () => {
@@ -82,7 +98,7 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder }) =
         pick(matches[activeIndex].language.name);
       } else if (resolved) {
         e.preventDefault();
-        onOpenOrder({ sourceLang: resolved, targetLang: "English" });
+        handleRouteLanguage(resolved, "English");
       }
       return;
     }
@@ -148,8 +164,8 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder }) =
                     // Delay so a click on an option registers before the list closes.
                     blurTimer.current = setTimeout(() => setIsOpen(false), 150);
                   }}
-                  placeholder="Type your language (e.g. Spanish, Farsi, Ukrainian, Dari)…"
-                  className={`${inputClass} pl-11 ${query ? "pr-11" : ""}`}
+                  placeholder="Type your language (e.g. Persian, Farsi, Urdu, Hindi, Dari, Pashto)…"
+                  className={`${inputClass} pl-11 ${query ? "pr-11" : ""} text-sm sm:text-base font-medium`}
                 />
 
                 {query && (
@@ -183,7 +199,7 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder }) =
                           onMouseDown={(e) => e.preventDefault()}
                           onMouseEnter={() => setActiveIndex(idx)}
                           onClick={() => pick(match.language.name)}
-                          className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors flex items-center justify-between gap-3 ${
+                          className={`w-full text-left px-4 py-3 text-sm sm:text-base font-semibold transition-colors flex items-center justify-between gap-3 ${
                             idx === activeIndex
                               ? "bg-teal-50 text-[#173d40]"
                               : "text-slate-700 hover:bg-slate-50"
@@ -191,7 +207,7 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder }) =
                         >
                           <span>{match.language.name}</span>
                           {match.via && (
-                            <span className="text-[11px] font-medium text-slate-400 whitespace-nowrap">
+                            <span className="text-xs font-medium text-slate-400 whitespace-nowrap">
                               matched &ldquo;{match.via}&rdquo;
                             </span>
                           )}
@@ -203,20 +219,20 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder }) =
               </div>
 
               <p
-                className={`mt-2.5 text-xs font-semibold flex items-start gap-1.5 ${
+                className={`mt-3 text-sm font-semibold flex items-start gap-2 ${
                   notFound ? "text-amber-700" : "text-emerald-700"
                 }`}
                 role="status"
               >
                 {notFound ? (
                   <>
-                    <Info className="w-3.5 h-3.5 flex-shrink-0 mt-px" strokeWidth={2.25} />
+                    <Info className="w-4 h-4 flex-shrink-0 mt-0.5" strokeWidth={2.25} />
                     Not in the list? We still translate it &mdash; pick &ldquo;Other / Language Not
                     Listed&rdquo; when you order.
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0 mt-px" strokeWidth={2.25} />
+                    <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" strokeWidth={2.25} />
                     {resolved
                       ? `${resolved} to English — available in 24h with 100% USCIS Acceptance Guarantee`
                       : "Available in 24h with 100% USCIS Acceptance Guarantee"}
@@ -226,37 +242,61 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder }) =
             </div>
 
             <button
-              onClick={() =>
-                onOpenOrder(resolved ? { sourceLang: resolved, targetLang: "English" } : undefined)
-              }
-              className="h-12 flex-shrink-0 bg-[#173d40] hover:bg-[#123032] text-white font-extrabold text-sm px-7 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-98"
+              onClick={() => {
+                if (resolved) {
+                  handleRouteLanguage(resolved, "English");
+                } else {
+                  handleRouteLanguage("Spanish", "English");
+                }
+              }}
+              className="h-12 flex-shrink-0 bg-[#173d40] hover:bg-[#123032] text-white font-extrabold text-sm sm:text-base px-7 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-98"
             >
               Start Order
               <ArrowRight className="w-4 h-4" strokeWidth={2.25} />
             </button>
           </div>
 
-          <div className="mt-7 pt-6 border-t border-slate-200">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-              Popular Language Pairs
-            </h3>
-            <ul className="flex flex-wrap gap-2">
-              {POPULAR_PAIRS.map((pair) => (
-                <li key={pair}>
+          <div className="mt-8 pt-7 border-t border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3.5">
+              <h3 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider">
+                Popular Languages (Translated to English)
+              </h3>
+              <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
+                Click any language to auto-populate quote
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {/* Row 1: Global & UN Official Languages */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                {POPULAR_LANGUAGES_ROW_1.map((item) => (
                   <button
-                    onClick={() =>
-                      onOpenOrder({
-                        sourceLang: pair.replace(" to English", ""),
-                        targetLang: "English",
-                      })
-                    }
-                    className="text-xs font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-teal-400 hover:bg-teal-50 px-3.5 py-2 rounded-full transition-colors"
+                    key={item.pair}
+                    onClick={() => handleRouteLanguage(item.name, "English")}
+                    className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3.5 py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 flex-shrink-0"
+                    title={`Order ${item.name} to English translation`}
                   >
-                    {pair}
+                    <span>{item.name}</span>
+                    <span className="text-[11px] font-normal text-slate-400">→ EN</span>
                   </button>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </div>
+
+              {/* Row 2: Major Regional & Commercial Languages */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                {POPULAR_LANGUAGES_ROW_2.map((item) => (
+                  <button
+                    key={item.pair}
+                    onClick={() => handleRouteLanguage(item.name, "English")}
+                    className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3.5 py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 flex-shrink-0"
+                    title={`Order ${item.name} to English translation`}
+                  >
+                    <span>{item.name}</span>
+                    <span className="text-[11px] font-normal text-slate-400">→ EN</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

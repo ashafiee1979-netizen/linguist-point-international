@@ -104,13 +104,13 @@ export const StatutorySection: React.FC<StatutorySectionProps> = ({ onOpenOrder 
               <span className="text-xs font-extrabold uppercase tracking-widest text-[#b45309] block">
                 Official Corporate Member
               </span>
-              <h3 className="text-base sm:text-lg font-bold text-[#002D62]">
+              <h3 className="text-lg sm:text-xl font-bold text-[#002D62]">
                 American Translators Association (ATA)
               </h3>
-              <p className="text-[11px] font-semibold text-slate-500 mt-0.5">
+              <p className="text-xs font-semibold text-slate-500 mt-0.5">
                 Corporate Membership #{SITE.ataMemberNumber} • Active &amp; Verified Standing
               </p>
-              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                 {SITE.name} translates and certifies all foreign documents under strict adherence to{" "}
                 <strong className="text-slate-800">ATA Standards for Translation and Certification</strong>. Every document includes our corporate seal, accredited translator certification, and sworn Statement of Accuracy fulfilling{" "}
                 <strong className="text-slate-800">8 CFR 204.2(a)(1)(iii)</strong>.
@@ -119,7 +119,7 @@ export const StatutorySection: React.FC<StatutorySectionProps> = ({ onOpenOrder 
           </div>
           <button
             onClick={onOpenOrder}
-            className="w-full md:w-auto px-4 py-2.5 rounded-lg bg-[#002D62] text-white font-bold text-xs uppercase tracking-wider hover:bg-blue-900 transition-colors flex-shrink-0 inline-flex items-center justify-center gap-2"
+            className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#002D62] text-white font-bold text-sm tracking-wide hover:bg-blue-900 transition-colors flex-shrink-0 inline-flex items-center justify-center gap-2 shadow-sm"
           >
             <BadgeCheck className="w-4 h-4" />
             Start Certified Order
@@ -133,29 +133,31 @@ export const StatutorySection: React.FC<StatutorySectionProps> = ({ onOpenOrder 
           description="Our certified and notarized translations hold a 100% acceptance record across federal agencies, top universities, medical networks, and global institutions."
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {ORGANIZATIONS.map((org) => (
             <div
               key={org.code}
-              className="bg-slate-50 hover:bg-white border border-slate-200 hover:border-teal-300 p-5 rounded-2xl shadow-2xs hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
+              className="bg-slate-50 hover:bg-white border border-slate-200 hover:border-[#173d40]/40 p-5 rounded-2xl shadow-2xs hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between"
             >
-              <div className="flex items-center justify-between gap-1.5 mb-2 flex-wrap">
-                <span className="font-extrabold text-[10px] text-[#173d40] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                  {org.code}
-                </span>
-                <span className="text-[10px] text-emerald-700 font-bold whitespace-nowrap">✓ {org.tag}</span>
+              <div>
+                <div className="flex items-center justify-between gap-1.5 mb-2.5 flex-wrap">
+                  <span className="font-extrabold text-xs text-[#173d40] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                    {org.code}
+                  </span>
+                  <span className="text-xs text-emerald-800 font-bold whitespace-nowrap">✓ {org.tag}</span>
+                </div>
+                <h3 className="font-bold text-sm sm:text-[15px] text-slate-900 mb-1.5 leading-snug">{org.name}</h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{org.scope}</p>
               </div>
-              <h3 className="font-bold text-sm text-slate-900 mb-1 leading-snug">{org.name}</h3>
-              <p className="text-xs text-slate-500 leading-snug">{org.scope}</p>
             </div>
           ))}
         </div>
 
-        <ul className="flex flex-wrap justify-center gap-2 mt-10">
+        <ul className="flex flex-wrap justify-center gap-2.5 mt-10">
           {COMPLIANCE_CHIPS.map((chip) => (
             <li
               key={chip}
-              className="text-[11px] font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full"
+              className="text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-full shadow-2xs"
             >
               {chip}
             </li>
@@ -163,7 +165,7 @@ export const StatutorySection: React.FC<StatutorySectionProps> = ({ onOpenOrder 
         </ul>
 
         <div className={`${SECTION_FOOTNOTE_GAP} text-center`}>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm sm:text-base text-slate-600">
             Need your documents certified for USCIS, universities, courts, or government bodies?{" "}
             <button
               onClick={onOpenOrder}

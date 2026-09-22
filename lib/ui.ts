@@ -24,7 +24,7 @@ export const textareaClass = `${controlBase} px-3.5 py-3 resize-y min-h-[88px]`;
 export const selectClass = `${controlBase} ${CONTROL_HEIGHT} pl-3.5 pr-10 appearance-none bg-none cursor-pointer font-medium`;
 
 /** Field label, used above every control. */
-export const labelClass = "block text-xs font-bold text-slate-700 mb-1.5";
+export const labelClass = "block text-sm font-bold text-slate-700 mb-2";
 
 /** Same treatment for a select that is still showing its placeholder. */
 export const selectPlaceholderClass = "text-slate-400";

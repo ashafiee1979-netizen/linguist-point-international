@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X, Upload, CheckCircle2, Loader2, AlertCircle, FileText, Trash2 } from "lucide-react";
+import { X, Upload, CheckCircle2, Loader2, AlertCircle, FileText, Trash2, Clock } from "lucide-react";
 import { POPULAR_LANGUAGES, OTHER_LANGUAGES } from "@/lib/languages";
 import { calculatePrice, PRICING } from "@/lib/pricing";
 import type { ServiceType } from "@/lib/pricing";
@@ -18,6 +18,12 @@ interface OrderModalProps {
 
 const MAX_FILE_MB = 25;
 const ALL_LANGUAGE_OPTIONS = [...POPULAR_LANGUAGES, ...OTHER_LANGUAGES];
+
+const ADD_ONS = [
+  { key: "rush", label: "12-Hour Priority Rush", fee: PRICING.rushFee },
+  { key: "notarized", label: "Notarized Certificate & Seal", fee: PRICING.notarizationFee },
+  { key: "hardCopy", label: "Physical Wet-Ink Hard Copy", fee: PRICING.shippingFee },
+] as const;
 
 export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initialData }) => {
   const [clientName, setClientName] = useState("");
@@ -37,6 +43,12 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
   const [confirmation, setConfirmation] = useState<{ orderNumber: string; turnaround: string } | null>(
     null
   );
+
+  const addOnState: Record<string, [boolean, (value: boolean) => void]> = {
+    rush: [isRush, setIsRush],
+    notarized: [isNotarized, setIsNotarized],
+    hardCopy: [isHardCopy, setIsHardCopy],
+  };
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -214,7 +226,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in"
+      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-fade-in"
       onClick={handleBackdropClick}
     >
       <div
@@ -222,21 +234,32 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
         role="dialog"
         aria-modal="true"
         aria-labelledby="order-modal-title"
-        className="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative my-4 sm:my-8 animate-modal-in"
+        className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl relative flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden animate-modal-in border border-slate-200"
       >
-        <button
-          ref={closeButtonRef}
-          onClick={onClose}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
-          aria-label="Close order form"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Pinned Header */}
+        <div className="px-5 sm:px-6 py-3.5 border-b border-slate-100 flex items-center justify-between flex-shrink-0 bg-white">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-teal-800 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200/60">
+              Fast Checkout
+            </span>
+            <h3 id="order-modal-title" className="text-base sm:text-lg font-extrabold text-slate-900">
+              {confirmation ? "Order Confirmation" : "Upload & Place Translation Order"}
+            </h3>
+          </div>
+          <button
+            ref={closeButtonRef}
+            onClick={onClose}
+            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
+            aria-label="Close order form"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
         {confirmation ? (
-          <div className="text-center py-8 sm:py-10 space-y-3">
+          <div className="p-6 sm:p-8 text-center space-y-3 overflow-y-auto flex-1 flex flex-col justify-center items-center">
             <CheckCircle2 className="w-14 h-14 sm:w-16 sm:h-16 text-emerald-600 mx-auto" />
-            <h3 id="order-modal-title" className="text-xl sm:text-2xl font-extrabold text-slate-900">
+            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
               Order Received
             </h3>
             <p className="text-sm text-slate-600 max-w-sm mx-auto">
@@ -247,230 +270,281 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
             </p>
             <button
               onClick={onClose}
-              className="mt-2 bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs px-6 py-2.5 rounded-lg transition-colors"
+              className="mt-3 bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-lg transition-colors shadow-sm"
             >
               Done
             </button>
           </div>
         ) : (
-          <form onSubmit={handleOrderSubmit} className="space-y-5">
-            <div className="pr-8">
-              <span className="text-xs font-bold text-[#173d40] uppercase tracking-wider">Fast Checkout</span>
-              <h3 id="order-modal-title" className="text-lg sm:text-xl font-extrabold text-slate-900">
-                Upload &amp; Confirm Translation
-              </h3>
-            </div>
-
-            {/* Service type */}
-            <div
-              className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl"
-              role="group"
-              aria-label="Translation service type"
-            >
-              {(
-                [
-                  { type: "certified" as const, label: "Certified", price: `$${PRICING.pricePerPage.toFixed(2)}/pg` },
-                  { type: "standard" as const, label: "Standard", price: `$${PRICING.pricePerWord.toFixed(2)}/wd` },
-                ]
-              ).map((option) => {
-                const active = serviceType === option.type;
-                return (
-                  <button
-                    key={option.type}
-                    type="button"
-                    onClick={() => setServiceType(option.type)}
-                    aria-pressed={active}
-                    className={`px-2 py-2 rounded-lg text-xs font-bold transition-all ${
-                      active ? "bg-white text-[#173d40] shadow-sm" : "text-slate-500 hover:text-slate-700"
-                    }`}
-                  >
-                    {option.label}{" "}
-                    <span className={active ? "text-slate-500" : "text-slate-400"}>({option.price})</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Document Upload Area */}
-            <div>
-              <div className="border-2 border-dashed border-slate-300 rounded-xl p-5 sm:p-6 text-center hover:bg-slate-50 hover:border-teal-400 transition-colors cursor-pointer relative">
-                <input
-                  type="file"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png,.docx"
-                  onChange={handleFileSelect}
-                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  aria-label="Attach documents to translate"
-                />
-                <Upload className="w-8 h-8 text-[#173d40] mx-auto mb-2" />
-                <p className="text-xs font-bold text-slate-700">Drag &amp; drop files here or click to browse</p>
-                <span className="text-[11px] text-slate-400">
-                  PDF, JPG, PNG, DOCX up to {MAX_FILE_MB} MB (256-bit encrypted vault)
-                </span>
+          <form onSubmit={handleOrderSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+            {/* Scrollable Form Body */}
+            <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 space-y-3.5">
+              {/* Service type segmented switcher */}
+              <div
+                className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl"
+                role="group"
+                aria-label="Translation service type"
+              >
+                {(
+                  [
+                    { type: "certified" as const, label: "Certified", price: `$${PRICING.pricePerPage.toFixed(2)}/pg` },
+                    { type: "standard" as const, label: "Standard", price: `$${PRICING.pricePerWord.toFixed(2)}/wd` },
+                  ]
+                ).map((option) => {
+                  const active = serviceType === option.type;
+                  return (
+                    <button
+                      key={option.type}
+                      type="button"
+                      onClick={() => setServiceType(option.type)}
+                      aria-pressed={active}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        active ? "bg-white text-[#173d40] shadow-xs" : "text-slate-500 hover:text-slate-700"
+                      }`}
+                    >
+                      {option.label}{" "}
+                      <span className={active ? "text-teal-700 font-semibold" : "text-slate-400"}>({option.price})</span>
+                    </button>
+                  );
+                })}
               </div>
 
-              {uploadedFiles.length > 0 && (
-                <ul className="mt-2 space-y-1">
-                  {uploadedFiles.map((file, i) => (
-                    <li
-                      key={`${file.name}-${i}`}
-                      className="text-xs font-semibold text-emerald-800 flex items-center gap-2 bg-emerald-50 px-2.5 py-1.5 rounded border border-emerald-200"
-                    >
-                      <FileText className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span className="truncate flex-grow text-left">{file.name}</span>
-                      <span className="text-[10px] text-emerald-600 flex-shrink-0">
-                        {(file.size / 1024).toFixed(0)} KB
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => removeFile(i)}
-                        className="text-emerald-700 hover:text-red-600 transition-colors flex-shrink-0"
-                        aria-label={`Remove ${file.name}`}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {/* Document Upload Area - compact */}
+              <div>
+                <div className="border border-dashed border-teal-300 bg-teal-50/20 hover:bg-teal-50/60 rounded-xl px-4 py-3 text-center transition-colors cursor-pointer relative group">
+                  <input
+                    type="file"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png,.docx"
+                    onChange={handleFileSelect}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    aria-label="Attach documents to translate"
+                  />
+                  <div className="flex items-center justify-center gap-2.5 text-xs text-slate-700">
+                    <Upload className="w-4 h-4 text-[#173d40] flex-shrink-0 group-hover:scale-110 transition-transform" />
+                    <span className="font-bold text-[#173d40]">Drag &amp; drop files</span>
+                    <span className="text-slate-400">or click to browse (PDF, JPG, PNG, DOCX up to {MAX_FILE_MB}MB)</span>
+                  </div>
+                </div>
 
-              {fileError && (
-                <p className="mt-2 text-xs font-semibold text-amber-700 flex items-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                  {fileError}
+                {uploadedFiles.length > 0 && (
+                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                    {uploadedFiles.map((file, i) => (
+                      <li
+                        key={`${file.name}-${i}`}
+                        className="text-xs font-semibold text-emerald-800 flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200"
+                      >
+                        <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="truncate max-w-[180px]">{file.name}</span>
+                        <span className="text-[10px] text-emerald-600">
+                          ({(file.size / 1024).toFixed(0)} KB)
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(i)}
+                          className="text-emerald-700 hover:text-red-600 transition-colors ml-0.5"
+                          aria-label={`Remove ${file.name}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {fileError && (
+                  <p className="mt-2 text-xs font-semibold text-amber-700 flex items-center gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    {fileError}
+                  </p>
+                )}
+              </div>
+
+              {/* Name & Email in 2 columns */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="order-name" className="block text-xs font-bold text-slate-700 mb-1">
+                    Your Name *
+                  </label>
+                  <input
+                    id="order-name"
+                    type="text"
+                    required
+                    autoComplete="name"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    placeholder="e.g. Maria Gonzalez"
+                    className={`${inputClass} text-xs sm:text-sm py-2`}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="order-email" className="block text-xs font-bold text-slate-700 mb-1">
+                    Email Address *
+                  </label>
+                  <input
+                    id="order-email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    placeholder="name@example.com"
+                    className={`${inputClass} text-xs sm:text-sm py-2`}
+                  />
+                </div>
+              </div>
+
+              {/* Languages & Page Count in 3 columns on sm screens */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div>
+                  <label htmlFor="order-source" className="block text-xs font-bold text-slate-700 mb-1">
+                    Source Language
+                  </label>
+                  <Select
+                    id="order-source"
+                    value={sourceLang}
+                    onChange={(e) => setSourceLang(e.target.value)}
+                    className="text-xs sm:text-sm py-2"
+                  >
+                    {sourceLang && !ALL_LANGUAGE_OPTIONS.some((l) => l.name === sourceLang) && (
+                      <option value={sourceLang}>{sourceLang}</option>
+                    )}
+                    {renderLanguageOptions("m-src")}
+                  </Select>
+                </div>
+                <div>
+                  <label htmlFor="order-target" className="block text-xs font-bold text-slate-700 mb-1">
+                    Target Language
+                  </label>
+                  <Select
+                    id="order-target"
+                    value={targetLang}
+                    onChange={(e) => setTargetLang(e.target.value)}
+                    className="text-xs sm:text-sm py-2"
+                  >
+                    {renderLanguageOptions("m-tgt")}
+                  </Select>
+                </div>
+                <div>
+                  {serviceType === "certified" ? (
+                    <>
+                      <label htmlFor="order-pages" className="block text-xs font-bold text-slate-700 mb-1">
+                        Pages (250 wds/pg)
+                      </label>
+                      <input
+                        id="order-pages"
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        max={PRICING.maxPages}
+                        value={pages}
+                        onChange={(e) =>
+                          setPages(Math.min(PRICING.maxPages, Math.max(1, parseInt(e.target.value, 10) || 1)))
+                        }
+                        className={`${inputClass} no-spinner text-center font-bold text-xs sm:text-sm py-2`}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <label htmlFor="order-words" className="block text-xs font-bold text-slate-700 mb-1">
+                        Words (${PRICING.standardMinimum.toFixed(0)} min)
+                      </label>
+                      <input
+                        id="order-words"
+                        type="number"
+                        inputMode="numeric"
+                        min={50}
+                        step={50}
+                        value={words}
+                        onChange={(e) => setWords(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                        className={`${inputClass} no-spinner text-center font-bold text-xs sm:text-sm py-2`}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Optional Services in a responsive 3-column card grid */}
+              <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                <span className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                  Optional Services &amp; Expedited Delivery
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {ADD_ONS.map((addOn) => {
+                    const [checked, setChecked] = addOnState[addOn.key];
+                    return (
+                      <label
+                        key={addOn.key}
+                        className={`flex flex-col justify-between p-2.5 rounded-xl border cursor-pointer transition-colors ${
+                          checked
+                            ? "border-teal-500 bg-teal-50/70 shadow-2xs"
+                            : "border-slate-200 hover:bg-slate-50"
+                        }`}
+                      >
+                        <span className="flex items-start gap-2">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => setChecked(e.target.checked)}
+                            className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 accent-[#173d40] rounded"
+                          />
+                          <span className="font-semibold text-slate-800 text-xs leading-snug">
+                            {addOn.label}
+                          </span>
+                        </span>
+                        <span className="text-[11px] font-extrabold text-teal-800 mt-2 text-right">
+                          +${addOn.fee.toFixed(2)}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {submitError && (
+                <p
+                  role="alert"
+                  className="text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 flex items-start gap-2"
+                >
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-px" />
+                  {submitError}
                 </p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="order-name" className={labelClass}>
-                  Your Name *
-                </label>
-                <input
-                  id="order-name"
-                  type="text"
-                  required
-                  autoComplete="name"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  placeholder="e.g. Maria Gonzalez"
-                  className={inputClass}
-                />
+            {/* Pinned Sticky Footer */}
+            <div className="px-5 sm:px-6 py-3 bg-slate-50 border-t border-slate-200 flex-shrink-0 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase font-bold tracking-wider leading-none">
+                    Total Cost
+                  </span>
+                  <span className="text-xl sm:text-2xl font-black text-[#173d40] leading-tight">
+                    ${price.totalAmount.toFixed(2)}
+                  </span>
+                </div>
+                <div className="hidden sm:block text-[11px] text-slate-500 border-l border-slate-200 pl-3 leading-snug">
+                  <div>
+                    Base: <strong className="text-slate-700">${price.basePrice.toFixed(2)}</strong>
+                    {price.addOnsPrice > 0 && (
+                      <span className="text-teal-700"> • Add-ons: +${price.addOnsPrice.toFixed(2)}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 text-slate-700 font-semibold mt-0.5">
+                    <Clock className="w-3 h-3 text-[#173d40]" />
+                    <span>Est: {price.turnaround}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label htmlFor="order-email" className={labelClass}>
-                  Email Address *
-                </label>
-                <input
-                  id="order-email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className={inputClass}
-                />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="order-source" className={labelClass}>
-                  Source Language
-                </label>
-                <Select
-                  id="order-source"
-                  value={sourceLang}
-                  onChange={(e) => setSourceLang(e.target.value)}
-                >
-                  {/* A language typed into "Other" upstream is not in either
-                      list, so it is offered here as its own option. */}
-                  {sourceLang && !ALL_LANGUAGE_OPTIONS.some((l) => l.name === sourceLang) && (
-                    <option value={sourceLang}>{sourceLang}</option>
-                  )}
-                  {renderLanguageOptions("m-src")}
-                </Select>
-              </div>
-              <div>
-                <label htmlFor="order-target" className={labelClass}>
-                  Target Language
-                </label>
-                <Select
-                  id="order-target"
-                  value={targetLang}
-                  onChange={(e) => setTargetLang(e.target.value)}
-                >
-                  {renderLanguageOptions("m-tgt")}
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              {serviceType === "certified" ? (
-                <>
-                  <label htmlFor="order-pages" className={labelClass}>
-                    Page Count (250 words/page)
-                  </label>
-                  <input
-                    id="order-pages"
-                    type="number"
-                    inputMode="numeric"
-                    min={1}
-                    max={PRICING.maxPages}
-                    value={pages}
-                    onChange={(e) =>
-                      setPages(Math.min(PRICING.maxPages, Math.max(1, parseInt(e.target.value, 10) || 1)))
-                    }
-                    className={`${inputClass} no-spinner text-center font-bold`}
-                  />
-                </>
-              ) : (
-                <>
-                  <label htmlFor="order-words" className={labelClass}>
-                    Total Word Count (${PRICING.standardMinimum.toFixed(2)} minimum)
-                  </label>
-                  <input
-                    id="order-words"
-                    type="number"
-                    inputMode="numeric"
-                    min={50}
-                    step={50}
-                    value={words}
-                    onChange={(e) => setWords(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                    className={`${inputClass} no-spinner text-center font-bold`}
-                  />
-                </>
-              )}
-            </div>
-
-            {submitError && (
-              <p
-                role="alert"
-                className="text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 flex items-start gap-2"
-              >
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-px" />
-                {submitError}
-              </p>
-            )}
-
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
-              <div>
-                <span className="text-xs text-slate-500 block">Total Calculated Cost</span>
-                <span className="text-xl font-extrabold text-[#173d40]">
-                  ${price.totalAmount.toFixed(2)}
-                </span>
-                <span className="text-[11px] text-slate-500 block">{price.turnaround}</span>
-              </div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[#173d40] hover:bg-[#123032] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-xs px-6 py-3 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2"
+                className="bg-[#173d40] hover:bg-[#123032] disabled:opacity-60 disabled:cursor-not-allowed text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 sm:py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 flex-shrink-0 active:scale-98"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     Placing Order…
                   </>
                 ) : (
