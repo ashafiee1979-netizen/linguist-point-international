@@ -106,8 +106,8 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
   );
 
   return (
-    <section className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50 py-12 sm:py-16 lg:py-20 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+    <section className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50 pt-4 pb-12 sm:pt-6 sm:pb-16 lg:pt-8 lg:pb-16 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
         {/* Left Column: Value Proposition */}
         <div className="lg:col-span-7 space-y-5 sm:space-y-6">
