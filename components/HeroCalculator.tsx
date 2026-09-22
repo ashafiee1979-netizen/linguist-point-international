@@ -9,6 +9,7 @@ import { SITE } from "@/lib/site";
 import type { OrderDraft } from "@/lib/order";
 import { Select } from "@/components/ui/Select";
 import { inputClass, labelClass } from "@/lib/ui";
+import { PaymentLogos } from "@/components/PaymentLogos";
 
 interface HeroCalculatorProps {
   onOpenOrder: (draft?: Partial<OrderDraft>) => void;
@@ -401,7 +402,9 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
                   <ArrowRight className="w-4 h-4" strokeWidth={2.25} />
                 </button>
 
-                <p className="flex items-center justify-center gap-1.5 text-xs text-slate-500 pt-1.5">
+                <PaymentLogos className="mt-2" />
+
+                <p className="flex items-center justify-center gap-1.5 text-xs text-slate-500 pt-1">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                   No account required • Pay only when you confirm
                 </p>
