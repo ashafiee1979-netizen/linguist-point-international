@@ -164,13 +164,13 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
         </div>
 
         {/* Right Column: Instant Live Order Calculator */}
-        <div className="lg:col-span-5 w-full" id="order">
-          <div className={`bg-white rounded-2xl border p-5 sm:p-6 shadow-xl relative transition-all duration-300 ${
+        <div className="lg:col-span-5 w-full lg:-mt-10 xl:-mt-12" id="order">
+          <div className={`bg-white rounded-2xl border p-4 sm:p-5 shadow-xl relative transition-all duration-300 ${
             isHighlighted
               ? "border-[#173d40] ring-4 ring-[#173d40]/25 shadow-2xl scale-[1.01]"
               : "border-slate-200 shadow-slate-900/5"
           }`}>
-            <div className="border-b border-slate-100 pb-2.5 mb-3.5">
+            <div className="border-b border-slate-100 pb-2 mb-3">
               <span className="text-xs font-extrabold uppercase tracking-wider text-[#173d40]">
                 Instant Cost Builder
               </span>
@@ -179,7 +179,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
 
             {/* Service type toggle */}
             <div
-              className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl mb-3.5"
+              className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl mb-3"
               role="group"
               aria-label="Translation service type"
             >
@@ -211,9 +211,9 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
               })}
             </div>
 
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               {/* Language Selection Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label htmlFor="hero-source" className={labelClass}>
                     Source Language
@@ -341,13 +341,13 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
               )}
 
               {/* Add-ons */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
+              <div className="space-y-1.5 pt-2 border-t border-slate-100">
                 {ADD_ONS.map((addOn) => {
                   const [checked, setChecked] = addOnState[addOn.key];
                   return (
                     <label
                       key={addOn.key}
-                      className={`flex items-start justify-between gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-colors text-sm ${
+                      className={`flex items-start justify-between gap-2.5 py-1.5 px-2.5 rounded-xl border cursor-pointer transition-colors text-sm ${
                         checked ? "border-teal-500 bg-teal-50/70 shadow-xs" : "border-slate-200 hover:bg-slate-50"
                       }`}
                     >
@@ -369,7 +369,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
               </div>
 
               {/* Breakdown & total */}
-              <div className="pt-2.5 border-t border-slate-200 space-y-1.5">
+              <div className="pt-2 border-t border-slate-200 space-y-1">
                 <div className="flex justify-between text-sm text-slate-600">
                   <span>Base Price</span>
                   <span className="font-semibold text-slate-800">${price.basePrice.toFixed(2)}</span>
@@ -386,7 +386,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
                   </span>
                 </div>
 
-                <div className="flex items-end justify-between gap-3 pt-2.5 border-t border-slate-200 mb-2.5">
+                <div className="flex items-end justify-between gap-3 pt-2 border-t border-slate-200 mb-2">
                   <span className="text-sm font-medium text-slate-600">Total Quote Estimate</span>
                   <span className="text-3xl sm:text-4xl font-extrabold text-[#173d40] leading-none">
                     ${price.totalAmount.toFixed(2)}
