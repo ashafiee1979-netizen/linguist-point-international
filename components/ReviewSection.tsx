@@ -229,55 +229,57 @@ export const ReviewSection: React.FC = () => {
           eyebrow="Verified Client Feedback"
           title="Trusted by 5,000+ Clients Worldwide"
           description="Read verified feedback from immigration attorneys, academic evaluators, and corporate clients across 65+ language pairs."
+          className="mb-6 sm:mb-8"
         />
 
-        {/* Reviews Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 sm:mb-14">
-          {reviews.map((rev) => (
+        {/* Reviews Grid - Beautifully organized, compact, 3 columns x 2 rows */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 mb-6 sm:mb-8">
+          {reviews.slice(0, 6).map((rev) => (
             <div
               key={rev.id}
-              className="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-7 flex flex-col justify-between hover:bg-white hover:border-[#173d40]/40 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              className="bg-slate-50 border border-slate-200/90 rounded-xl p-3.5 sm:p-4 flex flex-col justify-between hover:bg-white hover:border-[#173d40]/40 hover:shadow-md transition-all duration-200"
             >
               <div>
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-teal-100/80 text-[#173d40] font-extrabold text-sm flex items-center justify-center flex-shrink-0 shadow-2xs">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-7 h-7 rounded-full bg-teal-100 text-[#173d40] font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-2xs">
                       {rev.initials}
                     </div>
                     <div className="min-w-0">
-                      <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight truncate">
                         {rev.clientName}
                       </h3>
-                      <span className="inline-flex items-center gap-1 text-xs text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded mt-0.5">
-                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                      <span className="inline-flex items-center gap-1 text-[10px] text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded leading-none mt-0.5">
+                        <ShieldCheck className="w-2.5 h-2.5 text-emerald-600" />
                         Verified Order
                       </span>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-[#173d40] bg-white border border-slate-200 px-2.5 py-1 rounded-full flex-shrink-0 text-right leading-tight shadow-2xs">
+                  <span className="text-[11px] font-bold text-[#173d40] bg-white border border-slate-200 px-2 py-0.5 rounded-full flex-shrink-0 text-right leading-tight shadow-2xs">
                     {rev.languagePair}
                   </span>
                 </div>
 
-                {/* Stars */}
-                <div className="flex items-center text-[#f59e0b] mb-2">
-                  {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-current" />
-                  ))}
+                {/* Rating & Case */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center text-[#f59e0b]">
+                    {[...Array(rev.rating)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    ))}
+                  </div>
+                  {rev.useCase && (
+                    <span className="text-[11px] font-medium text-slate-500 truncate max-w-[170px]" title={rev.useCase}>
+                      {rev.useCase}
+                    </span>
+                  )}
                 </div>
 
-                {rev.useCase && (
-                  <p className="text-xs font-medium text-slate-500 mb-2">
-                    Case: <span className="text-slate-700 font-semibold">{rev.useCase}</span>
-                  </p>
-                )}
-
-                <p className="text-sm sm:text-[15px] text-slate-700 leading-relaxed mb-3">
+                <p className="text-xs sm:text-[13px] text-slate-700 leading-snug line-clamp-3 italic mb-1">
                   &ldquo;{rev.comments}&rdquo;
                 </p>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-200/80 pt-3 mt-2">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-200/70 pt-2 mt-2">
                 <span>{rev.location}</span>
                 <span>{rev.dateAgo}</span>
               </div>
@@ -285,45 +287,45 @@ export const ReviewSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Interactive Verified Review Card */}
-        <div className="max-w-3xl mx-auto bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-9 shadow-sm">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start sm:items-center gap-3.5">
-              <div className="w-12 h-12 rounded-full bg-teal-100 text-[#173d40] flex items-center justify-center flex-shrink-0">
-                <MessageSquare className="w-6 h-6" />
+        {/* Compact Interactive Verified Review Card */}
+        <div className="max-w-3xl mx-auto bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 shadow-2xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-teal-100 text-[#173d40] flex items-center justify-center flex-shrink-0">
+                <MessageSquare className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
                   Completed an Order? Leave a Verified Review
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                  To eliminate unknown or fake reviews, reviews are unlocked 1 day after final delivery.
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Verified reviews unlock 1 day after final delivery via your order code.
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
               <button
                 type="button"
                 onClick={() => {
                   setShowReviewGate(!showReviewGate);
                   setSubmitSuccess(null);
                 }}
-                className="w-full sm:w-auto bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 flex-shrink-0"
+                className="w-full sm:w-auto bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs px-4 py-2.5 rounded-lg transition-all shadow-2xs flex items-center justify-center gap-1.5"
               >
-                <Lock className="w-4 h-4" />
+                <Lock className="w-3.5 h-3.5" />
                 {showReviewGate ? "Close Review Gate" : "Write Verified Review"}
               </button>
             </div>
           </div>
 
           {/* Admin Moderation Strip button if any pending reviews */}
-          <div className="mt-3 flex justify-end">
+          <div className="mt-2.5 flex justify-end">
             <button
               type="button"
               onClick={() => setShowAdminModal(true)}
-              className="text-xs font-semibold text-slate-500 hover:text-[#173d40] underline underline-offset-4 flex items-center gap-1.5"
+              className="text-[11px] font-semibold text-slate-400 hover:text-[#173d40] underline underline-offset-4 flex items-center gap-1"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+              <ShieldCheck className="w-3 h-3 text-slate-400" />
               Admin Moderation Portal {pendingReviews.length > 0 && `(${pendingReviews.length} pending)`}
             </button>
           </div>
