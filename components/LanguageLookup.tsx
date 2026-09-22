@@ -14,16 +14,13 @@ interface LanguageLookupProps {
 }
 
 // Organized strictly by international recognition (UN official languages) and global speaker population
-const POPULAR_LANGUAGES_ROW_1 = [
+const POPULAR_LANGUAGES = [
   { name: "Chinese", pair: "Chinese to English", code: "zh" },
   { name: "Spanish", pair: "Spanish to English", code: "es" },
   { name: "Hindi", pair: "Hindi to English", code: "hi" },
   { name: "Arabic", pair: "Arabic to English", code: "ar" },
   { name: "French", pair: "French to English", code: "fr" },
   { name: "Russian", pair: "Russian to English", code: "ru" },
-];
-
-const POPULAR_LANGUAGES_ROW_2 = [
   { name: "Urdu", pair: "Urdu to English", code: "ur" },
   { name: "German", pair: "German to English", code: "de" },
   { name: "Persian (Farsi)", pair: "Persian (Farsi) to English", code: "fa" },
@@ -122,7 +119,7 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder, onS
           description="Check your language pair below. Every translation includes a signed & stamped Certificate of Accuracy guaranteed for official acceptance."
         />
 
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-9 shadow-sm">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-7 shadow-sm">
           <div className="flex flex-col lg:flex-row gap-3 lg:items-start">
             <div className="flex-grow min-w-0">
               {/* This wrapper holds only the control, so the absolutely
@@ -256,8 +253,8 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder, onS
             </button>
           </div>
 
-          <div className="mt-8 pt-7 border-t border-slate-200">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3.5">
+          <div className="mt-6 pt-5 border-t border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
               <h3 className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider">
                 Popular Languages (Translated to English)
               </h3>
@@ -266,36 +263,19 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder, onS
               </span>
             </div>
 
-            <div className="flex flex-col gap-2">
-              {/* Row 1: Global & UN Official Languages */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
-                {POPULAR_LANGUAGES_ROW_1.map((item) => (
-                  <button
-                    key={item.pair}
-                    onClick={() => handleRouteLanguage(item.name, "English")}
-                    className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3.5 py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 flex-shrink-0"
-                    title={`Order ${item.name} to English translation`}
-                  >
-                    <span>{item.name}</span>
-                    <span className="text-[11px] font-normal text-slate-400">→ EN</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Row 2: Major Regional & Commercial Languages */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
-                {POPULAR_LANGUAGES_ROW_2.map((item) => (
-                  <button
-                    key={item.pair}
-                    onClick={() => handleRouteLanguage(item.name, "English")}
-                    className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3.5 py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 flex-shrink-0"
-                    title={`Order ${item.name} to English translation`}
-                  >
-                    <span>{item.name}</span>
-                    <span className="text-[11px] font-normal text-slate-400">→ EN</span>
-                  </button>
-                ))}
-              </div>
+            {/* Single Row: All Popular Languages */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 pt-0.5">
+              {POPULAR_LANGUAGES.map((item) => (
+                <button
+                  key={item.pair}
+                  onClick={() => handleRouteLanguage(item.name, "English")}
+                  className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3.5 py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1.5 flex-shrink-0"
+                  title={`Order ${item.name} to English translation`}
+                >
+                  <span>{item.name}</span>
+                  <span className="text-[11px] font-normal text-slate-400">→ EN</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
