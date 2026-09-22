@@ -89,12 +89,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
       )}
 
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 h-18 sm:h-22 flex items-center justify-between gap-4">
           <a href="#" className="flex items-center gap-3 shrink-0" aria-label={`${SITE.name} — home`}>
             <img
               src="/assets/logo-horizontal-cropped.png"
               alt={SITE.name}
-              className="h-10 sm:h-14 w-auto object-contain"
+              className="h-11 sm:h-16 md:h-[66px] w-auto object-contain transition-all"
             />
           </a>
 

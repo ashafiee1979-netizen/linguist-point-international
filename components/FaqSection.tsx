@@ -110,74 +110,66 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ onOpenOrder }) => {
 
   return (
     <section className={`${SECTION_PADDING} bg-slate-50 border-b border-slate-200`} id="faq">
-      <div className="max-w-4xl mx-auto px-4">
-        <SectionHeading
-          eyebrow="Clarity & Legal Compliance"
-          title="Frequently Asked Questions"
-          description="Comprehensive details on our certified translation standards, statutory acceptance guarantees, confidentiality, and page counting policies."
-        />
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-4xl mx-auto">
+          <SectionHeading
+            eyebrow="Clarity & Legal Compliance"
+            title="Frequently Asked Questions"
+            description="Comprehensive details on our certified translation standards, statutory acceptance guarantees, confidentiality, and page counting policies."
+          />
 
-        <div className="space-y-3">
-          {FAQ_ITEMS.map((item, idx) => {
-            const isOpen = openIdx === idx;
-            return (
-              <div
-                key={item.q}
-                className={`bg-white border rounded-xl overflow-hidden shadow-xs transition-colors ${
-                  isOpen ? "border-teal-300" : "border-slate-200"
-                }`}
-              >
-                <h3>
-                  <button
-                    onClick={() => toggle(idx)}
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-panel-${idx}`}
-                    id={`faq-trigger-${idx}`}
-                    className="w-full p-5 sm:p-6 text-left flex items-start justify-between gap-4 font-bold text-base sm:text-lg text-slate-900 hover:text-[#173d40] transition-colors"
-                  >
-                    <span className="flex items-start gap-3">
-                      <span className="text-[#173d40]/40 font-extrabold tabular-nums flex-shrink-0">
-                        {idx + 1}.
-                      </span>
-                      <span>{item.q}</span>
-                    </span>
-                    <span
-                      className={`flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-200 ${
-                        isOpen
-                          ? "bg-[#173d40] border-[#173d40] text-white rotate-180"
-                          : "bg-white border-slate-200 text-slate-400"
-                      }`}
-                      aria-hidden="true"
+          <div className="space-y-3">
+            {FAQ_ITEMS.map((item, idx) => {
+              const isOpen = openIdx === idx;
+              return (
+                <div
+                  key={item.q}
+                  className={`bg-white border rounded-xl overflow-hidden shadow-xs transition-colors ${
+                    isOpen ? "border-teal-300" : "border-slate-200"
+                  }`}
+                >
+                  <h3>
+                    <button
+                      onClick={() => toggle(idx)}
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-panel-${idx}`}
+                      id={`faq-trigger-${idx}`}
+                      className="w-full text-left px-5 sm:px-6 py-4 flex items-center justify-between gap-4 font-bold text-slate-900 hover:text-[#173d40] transition-colors"
                     >
-                      <ChevronDown className="w-4 h-4" strokeWidth={2.25} />
-                    </span>
-                  </button>
-                </h3>
-                {isOpen && (
-                  <div
-                    id={`faq-panel-${idx}`}
-                    role="region"
-                    aria-labelledby={`faq-trigger-${idx}`}
-                    className="px-5 sm:px-6 pb-6 text-sm sm:text-base text-slate-600 leading-relaxed border-t border-slate-100 pt-4 animate-accordion-down"
-                  >
-                    {item.a}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                      <span className="text-sm sm:text-base">{item.q}</span>
+                      <ChevronDown
+                        className={`w-5 h-5 text-slate-400 flex-shrink-0 transition-transform duration-200 ${
+                          isOpen ? "rotate-180 text-[#173d40]" : ""
+                        }`}
+                      />
+                    </button>
+                  </h3>
+                  {isOpen && (
+                    <div
+                      id={`faq-panel-${idx}`}
+                      role="region"
+                      aria-labelledby={`faq-trigger-${idx}`}
+                      className="px-5 sm:px-6 pb-5 pt-1 text-sm text-slate-600 leading-relaxed border-t border-slate-100 animate-fade-in"
+                    >
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-        <div className={`${SECTION_FOOTNOTE_GAP} text-center`}>
-          <p className="text-sm sm:text-base text-slate-600">
-            Have documents ready for official certification? Standard delivery in 24 hours.{" "}
-            <button
-              onClick={onOpenOrder}
-              className="font-extrabold text-[#173d40] underline underline-offset-4 hover:text-[#f59e0b] transition-colors"
-            >
-              Start Order
-            </button>
-          </p>
+          <div className={`${SECTION_FOOTNOTE_GAP} text-center`}>
+            <p className="text-sm sm:text-base text-slate-600">
+              Have documents ready for official certification? Standard delivery in 24 hours.{" "}
+              <button
+                onClick={onOpenOrder}
+                className="font-extrabold text-[#173d40] underline underline-offset-4 hover:text-[#f59e0b] transition-colors"
+              >
+                Start Order
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </section>

@@ -115,7 +115,7 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder, onS
 
   return (
     <section className={`${SECTION_PADDING} bg-white border-b border-slate-200`} id="languages">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4">
         <SectionHeading
           eyebrow="Instant Language Availability"
           title={`Certified Translation in ${SITE.languageCount} World Languages`}

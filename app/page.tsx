@@ -107,27 +107,29 @@ export default function Home() {
       <FaqSection onOpenOrder={() => handleOpenOrder()} />
 
       {/* 14. Conversion Strip */}
-      <section className="py-16 sm:py-20 text-center text-white bg-gradient-to-br from-[#0f172a] via-[#173d40] to-[#1e293b]">
-        <div className="max-w-4xl mx-auto px-4 space-y-5">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
-            Ready to Translate Your Documents Today?
-          </h2>
-          <p className="text-sm sm:text-base text-teal-100/90 max-w-2xl mx-auto">
-            Experience the fastest, most reliable certified document translation service. 100% acceptance guaranteed or your money back.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
-            <button
-              onClick={() => handleOpenOrder()}
-              className="bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-extrabold px-8 py-3.5 rounded-xl text-sm transition-all shadow-lg active:scale-95"
-            >
-              Order Certified Translation Now
-            </button>
-            <a
-              href="#enterprise-proposal"
-              className="border-2 border-white/40 hover:border-white hover:bg-white/10 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm transition-all flex items-center justify-center"
-            >
-              Request Enterprise Proposal
-            </a>
+      <section className="py-12 sm:py-16 text-center text-white bg-gradient-to-br from-[#0f172a] via-[#173d40] to-[#1e293b]">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-3xl mx-auto space-y-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+              Ready to Translate Your Documents Today?
+            </h2>
+            <p className="text-sm sm:text-base text-teal-100/90 max-w-2xl mx-auto">
+              Experience the fastest, most reliable certified document translation service. 100% acceptance guaranteed or your money back.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
+              <button
+                onClick={() => handleOpenOrder()}
+                className="bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-extrabold px-8 py-3.5 rounded-xl text-sm transition-all shadow-lg active:scale-95"
+              >
+                Order Certified Translation Now
+              </button>
+              <a
+                href="#enterprise-proposal"
+                className="border-2 border-white/40 hover:border-white hover:bg-white/10 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm transition-all flex items-center justify-center"
+              >
+                Request Enterprise Proposal
+              </a>
+            </div>
           </div>
         </div>
       </section>

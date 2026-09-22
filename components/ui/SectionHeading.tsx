@@ -44,10 +44,10 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
 };
 
 /** Vertical padding shared by every full-width section. */
-export const SECTION_PADDING = "py-16 sm:py-20 lg:py-24";
+export const SECTION_PADDING = "py-12 sm:py-14 lg:py-16";
 
 /** Space between a section heading block and the content beneath it. */
-export const SECTION_HEADING_GAP = "mb-12 sm:mb-14";
+export const SECTION_HEADING_GAP = "mb-8 sm:mb-10";
 
 /** Space between the content grid and the closing call-to-action line. */
-export const SECTION_FOOTNOTE_GAP = "mt-12 sm:mt-14";
+export const SECTION_FOOTNOTE_GAP = "mt-8 sm:mt-10";
