@@ -56,7 +56,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-white">
+    <main className="min-h-screen flex flex-col bg-white overflow-x-hidden w-full">
       {/* 1. Header & Top Announcement */}
       <Header onOpenOrder={() => handleOpenOrder()} />
 

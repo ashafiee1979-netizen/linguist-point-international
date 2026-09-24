@@ -264,18 +264,20 @@ export const LanguageLookup: React.FC<LanguageLookupProps> = ({ onOpenOrder, onS
               </span>
             </div>
 
-            {/* Single Row: Centered with equal spacing on both sides */}
-            <div className="flex items-center justify-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1 pt-0.5">
-              {POPULAR_LANGUAGES.map((item) => (
-                <button
-                  key={item.pair}
-                  onClick={() => handleRouteLanguage(item.name, "English")}
-                  className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1 flex-shrink-0"
-                  title={`Order ${item.name} to English translation`}
-                >
-                  <span>{item.name}</span>
-                </button>
-              ))}
+            {/* Single Row: Centered with equal spacing on desktop/laptop, smoothly scrollable from the beginning on mobile */}
+            <div className="w-full overflow-x-auto no-scrollbar pb-1 pt-0.5">
+              <div className="flex items-center justify-start xl:justify-center gap-1.5 sm:gap-2 w-max min-w-full px-1">
+                {POPULAR_LANGUAGES.map((item) => (
+                  <button
+                    key={item.pair}
+                    onClick={() => handleRouteLanguage(item.name, "English")}
+                    className="whitespace-nowrap text-xs sm:text-sm font-semibold text-[#173d40] bg-white border border-slate-200 hover:border-[#173d40] hover:bg-teal-50/80 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full transition-all shadow-2xs hover:shadow-xs flex items-center gap-1 flex-shrink-0"
+                    title={`Order ${item.name} to English translation`}
+                  >
+                    <span>{item.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

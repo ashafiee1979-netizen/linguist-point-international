@@ -60,9 +60,9 @@ export const PaymentLogos: React.FC<{ className?: string }> = ({ className = "" 
       </div>
 
       {/* Security & Reassurance Tagline */}
-      <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 font-medium">
+      <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-[11px] text-slate-500 font-medium text-center">
         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-        <span>Safe Checkout Powered by Stripe • Pay only upon confirmation</span>
+        <span className="leading-tight">Safe Checkout Powered by Stripe • Pay only upon confirmation</span>
       </div>
     </div>
   );

@@ -1,5 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#173d40",
+};
 
 export const metadata: Metadata = {
   title: "Linguist Point International | Official Certified Document Translation Services",
@@ -24,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased text-slate-800 bg-white">
+      <body className="font-sans antialiased text-slate-800 bg-white overflow-x-hidden w-full">
         {children}
       </body>
     </html>
