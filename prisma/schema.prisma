@@ -36,7 +36,9 @@ model Order {
   targetLanguage  String
   pageCount       Int            @default(1)
   wordCount       Int?
+  serviceType     String         @default("certified") // "certified" or "standard"
   serviceTier     String         @default("CERTIFIED") // CERTIFIED, NOTARIZED, ENTERPRISE
+  turnaround      String?        // e.g. "Standard 24h", "12-Hour Priority Rush"
   
   // Add-on options
   isRush12Hour    Boolean        @default(false)
@@ -44,7 +46,7 @@ model Order {
   isHardCopyMail  Boolean        @default(false)
   
   // Financials
-  subtotal        Decimal        @db.Decimal(10, 2)
+  subtotal        Decimal        @default(0) @db.Decimal(10, 2)
   totalAmount     Decimal        @db.Decimal(10, 2)
   currency        String         @default("USD")
   paymentStatus   PaymentStatus  @default(UNPAID)

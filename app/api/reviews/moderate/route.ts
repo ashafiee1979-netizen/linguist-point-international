@@ -1,12 +1,49 @@
 import { NextResponse } from "next/server";
 import { approveReview, getPendingReviews, rejectReview } from "@/lib/review-store";
 
-export async function GET() {
+function isAuthorized(request: Request): boolean {
+  const adminKey = process.env.ADMIN_API_KEY;
+
+  // In production, ADMIN_API_KEY must be configured
+  if (!adminKey) {
+    if (process.env.NODE_ENV === "production") {
+      return false;
+    }
+    // Allow local development testing only if dev key is explicitly passed
+    const devFallbackKey = "dev-admin-key-change-in-prod";
+    const headerKey = request.headers.get("x-admin-key");
+    const authHeader = request.headers.get("authorization");
+    const bearerKey = authHeader?.startsWith("Bearer ") ? authHeader.substring(7) : null;
+    return headerKey === devFallbackKey || bearerKey === devFallbackKey;
+  }
+
+  const headerKey = request.headers.get("x-admin-key");
+  const authHeader = request.headers.get("authorization");
+  const bearerKey = authHeader?.startsWith("Bearer ") ? authHeader.substring(7) : null;
+
+  return headerKey === adminKey || bearerKey === adminKey;
+}
+
+export async function GET(request: Request) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized. Valid admin API key required." },
+      { status: 401 }
+    );
+  }
+
   const pending = getPendingReviews();
   return NextResponse.json({ success: true, pending });
 }
 
 export async function POST(request: Request) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized. Valid admin API key required." },
+      { status: 401 }
+    );
+  }
+
   let body: Record<string, unknown>;
 
   try {

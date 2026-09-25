@@ -13,3 +13,5 @@ yarn-error.log*
 
 # local editor / agent config
 .claude/
+.data/
+.env

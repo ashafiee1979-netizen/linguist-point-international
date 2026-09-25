@@ -21,7 +21,14 @@ export async function POST(request: Request) {
   const location = typeof body.location === "string" ? body.location.trim() : "United States";
   const languagePair = typeof body.languagePair === "string" ? body.languagePair.trim() : "";
   const useCase = typeof body.useCase === "string" ? body.useCase.trim() : "Official Regulatory Submission";
-  const rating = Number(body.rating) || 5;
+  const rating = Number(body.rating);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return NextResponse.json(
+      { success: false, error: "Rating must be an integer between 1 and 5." },
+      { status: 400 }
+    );
+  }
+
   const comments = typeof body.comments === "string" ? body.comments.trim() : "";
 
   if (!orderNumber || !clientEmail) {
@@ -38,7 +45,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = submitVerifiedReview({
+  if (comments.length > 1000) {
+    return NextResponse.json(
+      { success: false, error: "Comments must not exceed 1000 characters." },
+      { status: 400 }
+    );
+  }
+
+  const result = await submitVerifiedReview({
     orderNumber,
     clientEmail,
     clientName,

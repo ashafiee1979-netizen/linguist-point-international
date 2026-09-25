@@ -41,8 +41,6 @@ interface PendingReview {
 export const ReviewSection: React.FC = () => {
   const [reviews, setReviews] = useState<ReviewMock[]>(INITIAL_REVIEWS);
   const [showReviewGate, setShowReviewGate] = useState(false);
-  const [showAdminModal, setShowAdminModal] = useState(false);
-  const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([]);
 
   // Step 1: Verification Form State
   const [orderNumber, setOrderNumber] = useState("");
@@ -80,22 +78,8 @@ export const ReviewSection: React.FC = () => {
     }
   };
 
-  // Load pending reviews for admin
-  const loadPendingReviews = async () => {
-    try {
-      const res = await fetch("/api/reviews/moderate");
-      const data = await res.json();
-      if (data.success && Array.isArray(data.pending)) {
-        setPendingReviews(data.pending);
-      }
-    } catch {
-      // ignore
-    }
-  };
-
   useEffect(() => {
     loadReviews();
-    loadPendingReviews();
   }, []);
 
   const handleVerifyOrder = async (e: React.FormEvent) => {
@@ -181,36 +165,11 @@ export const ReviewSection: React.FC = () => {
       setVerifiedOrder(null);
       setOrderNumber("");
       setClientEmail("");
-      loadPendingReviews();
     } catch (err) {
       setVerificationError(err instanceof Error ? err.message : "Failed to submit review.");
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleModerateAction = async (reviewId: string, action: "approve" | "reject") => {
-    try {
-      const res = await fetch("/api/reviews/moderate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reviewId, action }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        loadPendingReviews();
-        loadReviews();
-      }
-    } catch {
-      // ignore
-    }
-  };
-
-  const fillSampleOrder = (num: string, mail: string) => {
-    setOrderNumber(num);
-    setClientEmail(mail);
-    setVerificationError(null);
-    setVerificationInfo(null);
   };
 
   const ratingDescriptions: Record<number, string> = {
@@ -318,18 +277,6 @@ export const ReviewSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Admin Moderation Strip button if any pending reviews */}
-          <div className="mt-2.5 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setShowAdminModal(true)}
-              className="text-[11px] font-semibold text-slate-400 hover:text-[#173d40] underline underline-offset-4 flex items-center gap-1"
-            >
-              <ShieldCheck className="w-3 h-3 text-slate-400" />
-              Admin Moderation Portal {pendingReviews.length > 0 && `(${pendingReviews.length} pending)`}
-            </button>
-          </div>
-
           {/* Review Gate Content */}
           {showReviewGate && (
             <div className="mt-6 pt-6 border-t border-slate-200 animate-fade-in space-y-6">
@@ -387,34 +334,6 @@ export const ReviewSection: React.FC = () => {
                         onChange={(e) => setClientEmail(e.target.value)}
                         className={inputClass}
                       />
-                    </div>
-                  </div>
-
-                  {/* Demo test helper */}
-                  <div className="bg-slate-100/80 rounded-xl p-3 text-xs text-slate-600 space-y-1.5">
-                    <span className="font-bold text-slate-700 block">Try a demo test order:</span>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => fillSampleOrder("LP-2026-8941", "farhad@example.com")}
-                        className="bg-white border border-slate-300 hover:border-teal-500 px-2.5 py-1 rounded text-[11px] font-semibold text-slate-800"
-                      >
-                        LP-2026-8941 (Delivered 3d ago • Eligible)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => fillSampleOrder("LP-2026-9915", "bilal@example.com")}
-                        className="bg-white border border-slate-300 hover:border-amber-500 px-2.5 py-1 rounded text-[11px] font-semibold text-slate-800"
-                      >
-                        LP-2026-9915 (Delivered 6h ago • Wait 18h)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => fillSampleOrder("LP-2026-4421", "elena@example.com")}
-                        className="bg-white border border-slate-300 hover:border-slate-500 px-2.5 py-1 rounded text-[11px] font-semibold text-slate-800"
-                      >
-                        LP-2026-4421 (In Translation)
-                      </button>
                     </div>
                   </div>
 
@@ -547,94 +466,6 @@ export const ReviewSection: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* Admin Moderation Modal */}
-        {showAdminModal && (
-          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-            <div className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
-              <button
-                onClick={() => setShowAdminModal(false)}
-                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
-                aria-label="Close admin modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="pr-8 mb-5">
-                <span className="text-xs font-bold text-[#173d40] uppercase tracking-wider">
-                  Admin Control Panel
-                </span>
-                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">
-                  Review Approval &amp; Quality Moderation
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Reviews must be submitted by verified clients and approved by a moderator before publishing to the live wall.
-                </p>
-              </div>
-
-              {pendingReviews.length === 0 ? (
-                <div className="text-center py-10 bg-slate-50 rounded-xl border border-slate-200">
-                  <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
-                  <p className="text-sm font-bold text-slate-800">All Reviews Up to Date</p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    There are no pending verified reviews awaiting moderation.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-                  {pendingReviews.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-sm text-slate-900">{item.clientName}</h4>
-                            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                              Order #{item.orderNumber}
-                            </span>
-                          </div>
-                          <span className="text-xs text-slate-500">
-                            {item.languagePair} • {item.location}
-                          </span>
-                        </div>
-                        <div className="flex items-center text-[#f59e0b]">
-                          {[...Array(item.rating)].map((_, i) => (
-                            <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                          ))}
-                        </div>
-                      </div>
-
-                      <p className="text-xs sm:text-sm text-slate-700 bg-white p-3 rounded-lg border border-slate-200">
-                        &ldquo;{item.comments}&rdquo;
-                      </p>
-
-                      <div className="flex items-center justify-end gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => handleModerateAction(item.id, "reject")}
-                          className="px-3 py-1.5 rounded-lg text-xs font-bold text-red-700 hover:bg-red-50 transition-colors"
-                        >
-                          Reject
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleModerateAction(item.id, "approve")}
-                          className="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white transition-colors flex items-center gap-1.5 shadow-sm"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          Approve to Live Wall
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
       </div>
     </section>
   );

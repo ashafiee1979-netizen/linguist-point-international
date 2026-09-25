@@ -20,6 +20,13 @@ export async function POST(request: Request) {
     );
   }
 
+  if (orderNumber.length > 50 || clientEmail.length > 100) {
+    return NextResponse.json(
+      { success: false, eligible: false, error: "Invalid order number or email format." },
+      { status: 400 }
+    );
+  }
+
   const result = verifyOrderEligibility(orderNumber, clientEmail);
 
   return NextResponse.json({

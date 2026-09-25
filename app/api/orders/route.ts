@@ -4,14 +4,7 @@ import type { ServiceType } from "@/lib/pricing";
 import { registerOrder } from "@/lib/review-store";
 
 const asString = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const clampInt = (value: unknown, min: number, max: number, fallback: number): number => {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return fallback;
-  return Math.min(Math.max(Math.floor(parsed), min), max);
-};
+const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export async function POST(request: Request) {
   let body: Record<string, unknown>;
@@ -19,7 +12,7 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ success: false, error: "Invalid request body." }, { status: 400 });
+    return NextResponse.json({ success: false, error: "Invalid JSON request body." }, { status: 400 });
   }
 
   const clientName = asString(body.clientName);
@@ -27,40 +20,90 @@ export async function POST(request: Request) {
   const sourceLanguage = asString(body.sourceLanguage);
   const targetLanguage = asString(body.targetLanguage);
 
-  const missing: string[] = [];
-  if (!clientName) missing.push("a name");
-  if (!EMAIL_PATTERN.test(clientEmail)) missing.push("a valid email address");
-  if (!sourceLanguage || !targetLanguage) missing.push("both languages");
-
-  if (missing.length > 0) {
+  // 1. Required field checks & string length bounds
+  if (!clientName || clientName.length < 2 || clientName.length > 100) {
     return NextResponse.json(
-      { success: false, error: `Please provide ${missing.join(", ")}.` },
+      { success: false, error: "A valid client name between 2 and 100 characters is required." },
       { status: 400 }
     );
   }
 
-  const serviceType: ServiceType = body.serviceType === "standard" ? "standard" : "certified";
-  const pageCount = clampInt(body.pageCount, 1, PRICING.maxPages, 1);
-  const wordCount = clampInt(body.wordCount, 1, 1_000_000, 250);
+  if (!clientEmail || clientEmail.length > 100 || !EMAIL_PATTERN.test(clientEmail)) {
+    return NextResponse.json(
+      { success: false, error: "A valid email address (max 100 characters) is required." },
+      { status: 400 }
+    );
+  }
 
-  // The total is recalculated here rather than trusted from the client, so the
-  // recorded amount always matches the published price list.
+  if (!sourceLanguage || sourceLanguage.length < 2 || sourceLanguage.length > 50) {
+    return NextResponse.json(
+      { success: false, error: "Source language must be between 2 and 50 characters." },
+      { status: 400 }
+    );
+  }
+
+  if (!targetLanguage || targetLanguage.length < 2 || targetLanguage.length > 50) {
+    return NextResponse.json(
+      { success: false, error: "Target language must be between 2 and 50 characters." },
+      { status: 400 }
+    );
+  }
+
+  // 2. Service type validation
+  const rawServiceType = body.serviceType;
+  if (rawServiceType !== "certified" && rawServiceType !== "standard") {
+    return NextResponse.json(
+      { success: false, error: "Service type must be either 'certified' or 'standard'." },
+      { status: 400 }
+    );
+  }
+  const serviceType: ServiceType = rawServiceType;
+
+  // 3. Numeric bounds validation (reject malformed input instead of silent fallback)
+  let pageCount = 1;
+  if (body.pageCount !== undefined && body.pageCount !== null) {
+    const parsedPage = Number(body.pageCount);
+    if (!Number.isInteger(parsedPage) || parsedPage < 1 || parsedPage > PRICING.maxPages) {
+      return NextResponse.json(
+        { success: false, error: `Page count must be an integer between 1 and ${PRICING.maxPages}.` },
+        { status: 400 }
+      );
+    }
+    pageCount = parsedPage;
+  }
+
+  let wordCount = 250;
+  if (body.wordCount !== undefined && body.wordCount !== null) {
+    const parsedWords = Number(body.wordCount);
+    if (!Number.isInteger(parsedWords) || parsedWords < 1 || parsedWords > 1_000_000) {
+      return NextResponse.json(
+        { success: false, error: "Word count must be an integer between 1 and 1,000,000." },
+        { status: 400 }
+      );
+    }
+    wordCount = parsedWords;
+  }
+
+  // 4. Calculate deterministic pricing from published price list
+  const isRush12Hour = body.isRush12Hour === true;
+  const isNotarized = body.isNotarized === true;
+  const isHardCopyMail = body.isHardCopyMail === true;
+
   const price = calculatePrice({
     serviceType,
     pageCount,
     wordCount,
-    isRush12Hour: body.isRush12Hour === true,
-    isNotarized: body.isNotarized === true,
-    isHardCopyMail: body.isHardCopyMail === true,
+    isRush12Hour,
+    isNotarized,
+    isHardCopyMail,
   });
 
   try {
-    // In production with Neon, this executes:
-    // await prisma.order.create({ data: { ... } });
+    const orderNumber = `LP-${Math.floor(100000 + Math.random() * 900000)}`;
 
-    const orderRecord = {
+    const savedOrder = await registerOrder({
       id: `ord_${Date.now()}`,
-      orderNumber: `LP-${Math.floor(100000 + Math.random() * 900000)}`,
+      orderNumber,
       clientName,
       clientEmail,
       serviceType,
@@ -70,28 +113,31 @@ export async function POST(request: Request) {
       wordCount,
       totalAmount: price.totalAmount,
       turnaround: price.turnaround,
-      paymentStatus: "PENDING",
-      orderStatus: "PENDING",
-      createdAt: new Date().toISOString(),
-    };
-
-    registerOrder({
-      orderNumber: orderRecord.orderNumber,
-      clientEmail: orderRecord.clientEmail,
-      clientName: orderRecord.clientName,
-      sourceLanguage: orderRecord.sourceLanguage,
-      targetLanguage: orderRecord.targetLanguage,
-      serviceType: orderRecord.serviceType,
     });
 
     return NextResponse.json({
       success: true,
-      message: "Order placed successfully (Ready for Neon DB)",
-      order: orderRecord,
+      message: "Translation intake recorded successfully. Our team will verify document parameters and email your confirmed invoice.",
+      order: {
+        id: savedOrder.id,
+        orderNumber: savedOrder.orderNumber,
+        clientName: savedOrder.clientName,
+        clientEmail: savedOrder.clientEmail,
+        serviceType: savedOrder.serviceType,
+        sourceLanguage: savedOrder.sourceLanguage,
+        targetLanguage: savedOrder.targetLanguage,
+        pageCount: savedOrder.pageCount,
+        wordCount: savedOrder.wordCount,
+        totalAmount: savedOrder.totalAmount,
+        turnaround: savedOrder.turnaround,
+        paymentStatus: savedOrder.status,
+        createdAt: savedOrder.createdAt,
+      },
     });
-  } catch {
+  } catch (error) {
+    console.error("Order intake processing error:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to process order." },
+      { success: false, error: "Failed to process translation intake." },
       { status: 500 }
     );
   }

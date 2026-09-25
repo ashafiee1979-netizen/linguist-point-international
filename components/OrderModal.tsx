@@ -240,10 +240,10 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
         <div className="px-5 sm:px-6 py-3.5 border-b border-slate-100 flex items-center justify-between flex-shrink-0 bg-white">
           <div className="flex items-center gap-2.5">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-teal-800 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200/60">
-              Fast Checkout
+              Translation Intake
             </span>
             <h3 id="order-modal-title" className="text-base sm:text-lg font-extrabold text-slate-900">
-              {confirmation ? "Order Confirmation" : "Upload & Place Translation Order"}
+              {confirmation ? "Intake Confirmation" : "Upload Documents & Request Translation"}
             </h3>
           </div>
           <button
@@ -257,20 +257,32 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
         </div>
 
         {confirmation ? (
-          <div className="p-6 sm:p-8 text-center space-y-3 overflow-y-auto flex-1 flex flex-col justify-center items-center">
+          <div className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1 flex flex-col justify-center items-center">
             <CheckCircle2 className="w-14 h-14 sm:w-16 sm:h-16 text-emerald-600 mx-auto" />
             <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-              Order Received
+              Translation Intake Received
             </h3>
-            <p className="text-sm text-slate-600 max-w-sm mx-auto">
-              Your translation job has been recorded with reference{" "}
-              <strong className="text-[#173d40]">{confirmation.orderNumber}</strong>. Expected delivery{" "}
-              <strong className="text-[#173d40]">{confirmation.turnaround.toLowerCase()}</strong>. A confirmation
-              email is on its way to <strong className="break-all">{clientEmail}</strong>.
-            </p>
+            <div className="text-sm text-slate-600 max-w-md mx-auto space-y-2.5">
+              <p>
+                Your translation request has been registered under reference{" "}
+                <strong className="text-[#173d40]">{confirmation.orderNumber}</strong>.
+              </p>
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm text-slate-700 text-left space-y-1.5 shadow-2xs">
+                <p className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-[#173d40]" />
+                  What happens next?
+                </p>
+                <p className="text-slate-600 leading-relaxed">
+                  Our linguistic compliance team is reviewing your document parameters for legibility and exact word count. We will email your verified price breakdown and secure Stripe checkout link to <strong className="break-all text-[#173d40]">{clientEmail}</strong> within 15–30 minutes.
+                </p>
+                <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-200">
+                  Target Turnaround: <strong className="text-slate-800">{confirmation.turnaround}</strong> (begins immediately upon payment confirmation).
+                </p>
+              </div>
+            </div>
             <button
               onClick={onClose}
-              className="mt-3 bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-lg transition-colors shadow-sm"
+              className="mt-2 bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-lg transition-colors shadow-sm"
             >
               Done
             </button>
@@ -537,20 +549,25 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-[#173d40] hover:bg-[#123032] disabled:opacity-60 disabled:cursor-not-allowed text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 sm:py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 flex-shrink-0 active:scale-98"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Placing Order…
-                  </>
-                ) : (
-                  "Confirm & Place Order"
-                )}
-              </button>
+              <div className="flex flex-col items-end">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-[#173d40] hover:bg-[#123032] disabled:opacity-60 disabled:cursor-not-allowed text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 sm:py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 flex-shrink-0 active:scale-98"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Submitting Intake…
+                    </>
+                  ) : (
+                    "Submit for Review & Quote"
+                  )}
+                </button>
+                <span className="text-[10px] text-slate-500 mt-1 hidden sm:inline">
+                  No charge now • Stripe invoice sent after review
+                </span>
+              </div>
             </div>
           </form>
         )}
