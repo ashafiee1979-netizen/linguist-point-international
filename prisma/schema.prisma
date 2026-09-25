@@ -82,6 +82,7 @@ model OrderFile {
 
 model Review {
   id              String         @id @default(cuid())
+  orderNumber     String?
   clientName      String
   initials        String
   location        String?
@@ -94,6 +95,7 @@ model Review {
   createdAt       DateTime       @default(now())
 
   @@index([rating])
+  @@index([orderNumber])
 }
 
 model RfpInquiry {

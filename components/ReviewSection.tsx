@@ -185,9 +185,9 @@ export const ReviewSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4">
         
         <SectionHeading
-          eyebrow="Verified Client Feedback"
+          eyebrow="Client Feedback & Case Studies"
           title="Trusted by 5,000+ Clients Worldwide"
-          description="Read verified feedback from immigration attorneys, academic evaluators, and corporate clients across 65+ language pairs."
+          description="Explore representative case studies and verified client feedback across 65+ language pairs. Completed an order? Submit your verified review below."
           className="mb-6 sm:mb-8"
         />
 
@@ -208,10 +208,17 @@ export const ReviewSection: React.FC = () => {
                       <h3 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight truncate">
                         {rev.clientName}
                       </h3>
-                      <span className="inline-flex items-center gap-1 text-[10px] text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded leading-none mt-0.5">
-                        <ShieldCheck className="w-2.5 h-2.5 text-emerald-600" />
-                        Verified Order
-                      </span>
+                      {rev.isSample ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-slate-600 font-semibold bg-slate-100 border border-slate-300 px-1.5 py-0.5 rounded leading-none mt-0.5">
+                          <ShieldCheck className="w-2.5 h-2.5 text-slate-500" />
+                          Representative Case
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded leading-none mt-0.5">
+                          <ShieldCheck className="w-2.5 h-2.5 text-emerald-600" />
+                          Verified Client Order
+                        </span>
+                      )}
                     </div>
                   </div>
                   <span className="text-[11px] font-bold text-[#173d40] bg-white border border-slate-200 px-2 py-0.5 rounded-full flex-shrink-0 text-right leading-tight shadow-2xs">

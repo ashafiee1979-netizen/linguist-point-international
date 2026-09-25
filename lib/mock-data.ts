@@ -11,6 +11,7 @@ export interface ReviewMock {
   dateAgo: string;
   isVerified?: boolean;
   isApproved?: boolean;
+  isSample?: boolean;
 }
 
 export const INITIAL_REVIEWS: ReviewMock[] = [
@@ -23,7 +24,8 @@ export const INITIAL_REVIEWS: ReviewMock[] = [
     useCase: 'USCIS Adjustment of Status (I-485)',
     rating: 5,
     comments: 'Needed an urgent certified translation of my birth and marriage certificates for my green card interview. Linguist Point completed everything in 16 hours. The signed Certificate of Accuracy met every USCIS regulation with zero RFEs!',
-    dateAgo: '3 days ago'
+    dateAgo: '3 days ago',
+    isSample: true,
   },
   {
     id: 'rev-2',
@@ -34,7 +36,8 @@ export const INITIAL_REVIEWS: ReviewMock[] = [
     useCase: 'WES Academic Credential Evaluation',
     rating: 5,
     comments: 'As a medical researcher submitting credential evaluations to WES, exact technical terminology was non-negotiable. The layout preservation of my German university diploma and transcripts was exceptional down to each stamp.',
-    dateAgo: '1 week ago'
+    dateAgo: '1 week ago',
+    isSample: true,
   },
   {
     id: 'rev-3',
@@ -45,7 +48,8 @@ export const INITIAL_REVIEWS: ReviewMock[] = [
     useCase: 'Legal Court Filings & Notarization',
     rating: 5,
     comments: 'Translated my Ukrainian civil records, diplomas, and power of attorney with expedited notarization. Everything arrived stamped, signed, and formatted identically to the originals. Flawless experience.',
-    dateAgo: '2 weeks ago'
+    dateAgo: '2 weeks ago',
+    isSample: true,
   },
   {
     id: 'rev-4',
@@ -56,7 +60,8 @@ export const INITIAL_REVIEWS: ReviewMock[] = [
     useCase: 'Consular Visa & Affidavit Filing',
     rating: 5,
     comments: 'Super fast turnaround and transparent pricing with no hidden fees. I needed an official translation for consular visa processing, and the embassy accepted the certificate without any questions.',
-    dateAgo: '2 weeks ago'
+    dateAgo: '2 weeks ago',
+    isSample: true,
   },
   {
     id: 'rev-5',
@@ -67,7 +72,8 @@ export const INITIAL_REVIEWS: ReviewMock[] = [
     useCase: "State DMV Driver's License",
     rating: 5,
     comments: "The DMV in New York is notoriously strict about foreign driver's licenses. Linguist Point's certified translation with the official accuracy stamp was approved at the counter in minutes.",
-    dateAgo: '3 weeks ago'
+    dateAgo: '3 weeks ago',
+    isSample: true,
   },
   {
     id: 'rev-6',
@@ -78,6 +84,7 @@ export const INITIAL_REVIEWS: ReviewMock[] = [
     useCase: 'Special Immigrant Visa (SIV) Case',
     rating: 5,
     comments: 'Our immigration law firm relies on Linguist Point for Dari and Pashto translations. Their legal accuracy, fast delivery, and USCIS-compliant certification make them our #1 trusted partner.',
-    dateAgo: '1 month ago'
+    dateAgo: '1 month ago',
+    isSample: true,
   }
 ];

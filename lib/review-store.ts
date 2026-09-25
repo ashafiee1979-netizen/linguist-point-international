@@ -19,6 +19,8 @@ export interface StoredOrder {
   deliveredAt?: string; // ISO date string
   createdAt: string;
   hasReview: boolean;
+  fileNames?: string[];
+  filesReceived?: boolean;
 }
 
 export interface StoredRfp {
@@ -45,7 +47,6 @@ const allowDemoOrders = process.env.ENABLE_TEST_ORDERS === "true" && !isProducti
 
 // File persistence path
 function getStorageFilePath(): string {
-  // Use .data in workspace, or fallback to /tmp if read-only filesystem
   const localDir = path.join(process.cwd(), ".data");
   try {
     if (!fs.existsSync(localDir)) {
@@ -71,8 +72,8 @@ function loadPersistedStore(): GlobalReviewStore | null {
         };
       }
     }
-  } catch {
-    // Ignore and fallback to defaults
+  } catch (err) {
+    console.warn("Could not load local persisted store:", err);
   }
   return null;
 }
@@ -81,8 +82,12 @@ function saveStoreToDisk(data: GlobalReviewStore) {
   try {
     const filePath = getStorageFilePath();
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-  } catch {
-    // Ignore in read-only environments
+  } catch (err) {
+    console.error("Local file store write failure:", err);
+    // If not using Prisma and local write fails, re-throw to make failure visible
+    if (!prisma) {
+      throw new Error(`Failed to write to local storage: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 }
 
@@ -119,6 +124,11 @@ if (!globalForStore.__linguistReviewStore) {
 
 const store = globalForStore.__linguistReviewStore;
 
+/**
+ * Register a new translation intake order.
+ * If Prisma PostgreSQL is connected, it acts as the primary source of truth,
+ * and any database write failure will propagate immediately to the caller.
+ */
 export async function registerOrder(order: {
   id?: string;
   orderNumber: string;
@@ -131,21 +141,22 @@ export async function registerOrder(order: {
   wordCount?: number;
   totalAmount?: number;
   turnaround?: string;
-}) {
+  fileNames?: string[];
+  filesReceived?: boolean;
+}): Promise<StoredOrder> {
   const newOrder: StoredOrder = {
     ...order,
     status: "PENDING",
     createdAt: new Date().toISOString(),
     hasReview: false,
+    fileNames: order.fileNames || [],
+    filesReceived: order.filesReceived ?? (order.fileNames && order.fileNames.length > 0),
   };
 
-  store.orders.push(newOrder);
-  saveStoreToDisk(store);
-
-  // If Prisma database is connected, persist to Postgres
+  // Primary Durable Source of Truth: Prisma PostgreSQL
   if (prisma) {
     try {
-      await prisma.order.create({
+      const dbOrder = await prisma.order.create({
         data: {
           orderNumber: newOrder.orderNumber,
           clientName: newOrder.clientName,
@@ -162,17 +173,67 @@ export async function registerOrder(order: {
           orderStatus: "PENDING",
         },
       });
+      newOrder.id = dbOrder.id;
     } catch (err) {
-      console.warn("Prisma order persistence fallback to local store:", err);
+      console.error("Critical: Prisma order write failure:", err);
+      // Make write failures visible - do NOT silently swallow DB errors in production
+      throw new Error(`Database order persistence failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
+
+  // Also sync to local memory/file store
+  store.orders.push(newOrder);
+  saveStoreToDisk(store);
 
   return newOrder;
 }
 
-export function findOrder(orderNumber: string, email: string): StoredOrder | undefined {
+/**
+ * Find an order by orderNumber and clientEmail.
+ * Queries PostgreSQL when Prisma is configured, falling back to local store.
+ */
+export async function findOrder(orderNumber: string, email: string): Promise<StoredOrder | undefined> {
   const normNumber = orderNumber.trim().toUpperCase();
   const normEmail = email.trim().toLowerCase();
+
+  if (prisma) {
+    try {
+      const dbOrder = await prisma.order.findFirst({
+        where: {
+          orderNumber: { equals: normNumber, mode: "insensitive" },
+          clientEmail: { equals: normEmail, mode: "insensitive" },
+        },
+      });
+
+      if (dbOrder) {
+        // Check if review already exists for this order in database
+        const existingReview = await prisma.review.findFirst({
+          where: { orderNumber: dbOrder.orderNumber },
+        });
+
+        return {
+          id: dbOrder.id,
+          orderNumber: dbOrder.orderNumber,
+          clientName: dbOrder.clientName,
+          clientEmail: dbOrder.clientEmail,
+          sourceLanguage: dbOrder.sourceLanguage,
+          targetLanguage: dbOrder.targetLanguage,
+          serviceType: dbOrder.serviceType,
+          pageCount: dbOrder.pageCount,
+          wordCount: dbOrder.wordCount ?? undefined,
+          totalAmount: Number(dbOrder.totalAmount),
+          turnaround: dbOrder.turnaround ?? undefined,
+          status: dbOrder.orderStatus as StoredOrder["status"],
+          deliveredAt: dbOrder.updatedAt ? dbOrder.updatedAt.toISOString() : undefined,
+          createdAt: dbOrder.createdAt.toISOString(),
+          hasReview: Boolean(existingReview),
+        };
+      }
+    } catch (err) {
+      console.error("Prisma findOrder query error:", err);
+      throw err;
+    }
+  }
 
   return store.orders.find(
     (o) =>
@@ -197,8 +258,12 @@ export interface VerificationResult {
   hoursRemaining?: number;
 }
 
-export function verifyOrderEligibility(orderNumber: string, email: string): VerificationResult {
-  const order = findOrder(orderNumber, email);
+/**
+ * Verify order eligibility for submitting a customer review.
+ * Awaits order lookup from the primary database source of truth.
+ */
+export async function verifyOrderEligibility(orderNumber: string, email: string): Promise<VerificationResult> {
+  const order = await findOrder(orderNumber, email);
 
   if (!order) {
     return {
@@ -279,6 +344,10 @@ export function verifyOrderEligibility(orderNumber: string, email: string): Veri
   };
 }
 
+/**
+ * Submit a verified customer review.
+ * Persists to PostgreSQL with visible error propagation, and queues for moderation.
+ */
 export async function submitVerifiedReview(data: {
   orderNumber: string;
   clientEmail: string;
@@ -289,14 +358,9 @@ export async function submitVerifiedReview(data: {
   rating: number;
   comments: string;
 }): Promise<{ success: boolean; review?: ReviewMock; error?: string }> {
-  const verification = verifyOrderEligibility(data.orderNumber, data.clientEmail);
+  const verification = await verifyOrderEligibility(data.orderNumber, data.clientEmail);
   if (!verification.eligible) {
     return { success: false, error: verification.message };
-  }
-
-  const order = findOrder(data.orderNumber, data.clientEmail);
-  if (order) {
-    order.hasReview = true;
   }
 
   const initials =
@@ -320,16 +384,15 @@ export async function submitVerifiedReview(data: {
     dateAgo: "Just now",
     isVerified: true,
     isApproved: false, // Default to false pending moderator approval
+    isSample: false,
   };
 
-  store.reviews.unshift(newReview);
-  saveStoreToDisk(store);
-
-  // If Prisma is available, also insert into Postgres
+  // Primary DB persistence
   if (prisma) {
     try {
-      await prisma.review.create({
+      const dbReview = await prisma.review.create({
         data: {
+          orderNumber: newReview.orderNumber,
           clientName: newReview.clientName,
           initials: newReview.initials,
           location: newReview.location,
@@ -341,23 +404,125 @@ export async function submitVerifiedReview(data: {
           isApproved: false,
         },
       });
+      newReview.id = dbReview.id;
     } catch (err) {
-      console.warn("Prisma review persistence fallback to local store:", err);
+      console.error("Critical: Prisma review write failure:", err);
+      throw new Error(`Database review persistence failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
+
+  // Update memory/file store
+  const localOrder = store.orders.find(
+    (o) =>
+      o.orderNumber.trim().toUpperCase() === data.orderNumber.trim().toUpperCase() &&
+      o.clientEmail.trim().toLowerCase() === data.clientEmail.trim().toLowerCase()
+  );
+  if (localOrder) {
+    localOrder.hasReview = true;
+  }
+
+  store.reviews.unshift(newReview);
+  saveStoreToDisk(store);
 
   return { success: true, review: newReview };
 }
 
-export function getApprovedReviews(): ReviewMock[] {
+/**
+ * Retrieve approved reviews for the public reviews wall.
+ * Reads from PostgreSQL when Prisma is configured.
+ */
+export async function getApprovedReviews(): Promise<ReviewMock[]> {
+  if (prisma) {
+    try {
+      const dbReviews = await prisma.review.findMany({
+        where: { isApproved: true },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (dbReviews.length > 0) {
+        return dbReviews.map((r: any) => ({
+          id: r.id,
+          orderNumber: r.orderNumber ?? undefined,
+          clientName: r.clientName,
+          initials: r.initials,
+          location: r.location ?? "United States",
+          languagePair: r.languagePair,
+          useCase: r.useCase ?? "Certified Translation",
+          rating: r.rating,
+          comments: r.comments,
+          dateAgo: "Verified Client",
+          isVerified: r.isVerified,
+          isApproved: r.isApproved,
+          isSample: false,
+        }));
+      }
+    } catch (err) {
+      console.error("Prisma getApprovedReviews error:", err);
+      throw err;
+    }
+  }
+
   return store.reviews.filter((r) => r.isApproved !== false);
 }
 
-export function getPendingReviews(): ReviewMock[] {
+/**
+ * Retrieve pending reviews for the moderation API.
+ * Reads from PostgreSQL when Prisma is configured.
+ */
+export async function getPendingReviews(): Promise<ReviewMock[]> {
+  if (prisma) {
+    try {
+      const dbReviews = await prisma.review.findMany({
+        where: { isApproved: false },
+        orderBy: { createdAt: "desc" },
+      });
+
+      return dbReviews.map((r: any) => ({
+        id: r.id,
+        orderNumber: r.orderNumber ?? undefined,
+        clientName: r.clientName,
+        initials: r.initials,
+        location: r.location ?? "United States",
+        languagePair: r.languagePair,
+        useCase: r.useCase ?? "Certified Translation",
+        rating: r.rating,
+        comments: r.comments,
+        dateAgo: "Pending QA",
+        isVerified: r.isVerified,
+        isApproved: r.isApproved,
+        isSample: false,
+      }));
+    } catch (err) {
+      console.error("Prisma getPendingReviews error:", err);
+      throw err;
+    }
+  }
+
   return store.reviews.filter((r) => r.isApproved === false);
 }
 
+/**
+ * Approve a review in the primary data store.
+ * Returns true if successfully updated, or false if not found.
+ */
 export async function approveReview(id: string): Promise<boolean> {
+  if (prisma) {
+    try {
+      await prisma.review.update({
+        where: { id },
+        data: { isApproved: true },
+      });
+      // Mirror to local cache
+      const local = store.reviews.find((r) => r.id === id);
+      if (local) local.isApproved = true;
+      saveStoreToDisk(store);
+      return true;
+    } catch {
+      // Prisma update throws if record does not exist
+      return false;
+    }
+  }
+
   const review = store.reviews.find((r) => r.id === id);
   if (review) {
     review.isApproved = true;
@@ -367,7 +532,24 @@ export async function approveReview(id: string): Promise<boolean> {
   return false;
 }
 
+/**
+ * Reject / delete a review in the primary data store.
+ * Returns true if deleted, or false if not found.
+ */
 export async function rejectReview(id: string): Promise<boolean> {
+  if (prisma) {
+    try {
+      await prisma.review.delete({
+        where: { id },
+      });
+      store.reviews = store.reviews.filter((r) => r.id !== id);
+      saveStoreToDisk(store);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   const initialLength = store.reviews.length;
   store.reviews = store.reviews.filter((r) => r.id !== id);
   if (store.reviews.length < initialLength) {
@@ -377,10 +559,11 @@ export async function rejectReview(id: string): Promise<boolean> {
   return false;
 }
 
-export async function registerRfpInquiry(data: StoredRfp) {
-  store.rfps.unshift(data);
-  saveStoreToDisk(store);
-
+/**
+ * Register an enterprise RFP inquiry.
+ * Persists directly to PostgreSQL when configured, propagating write failures.
+ */
+export async function registerRfpInquiry(data: StoredRfp): Promise<StoredRfp> {
   if (prisma) {
     try {
       await prisma.rfpInquiry.create({
@@ -395,9 +578,13 @@ export async function registerRfpInquiry(data: StoredRfp) {
         },
       });
     } catch (err) {
-      console.warn("Prisma RFP persistence fallback to local store:", err);
+      console.error("Critical: Prisma RFP inquiry write failure:", err);
+      throw new Error(`Database RFP persistence failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
+
+  store.rfps.unshift(data);
+  saveStoreToDisk(store);
 
   return data;
 }

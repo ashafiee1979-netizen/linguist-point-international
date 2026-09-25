@@ -65,20 +65,21 @@ npm run start
 - Any unauthorized or malformed requests return `401 Unauthorized`.
 - Client-facing UI exposes no administrative moderation actions.
 
-### 2. Dual-Layer Resilient Storage
-- **File System Persistence (`.data/store.json`)**: Automatic durable local store ensuring orders, reviews, and RFP inquiries persist across server restarts even without an external database.
-- **Prisma PostgreSQL Sync**: Seamless asynchronous persistence to PostgreSQL when `DATABASE_URL` is configured.
+### 2. Database Persistence as Primary Source of Truth
+- **Prisma PostgreSQL as Primary**: When `DATABASE_URL` is set, Prisma is the primary source of truth. All writes are awaited, and database failures propagate visibly to callers (preventing silent write failure masking).
+- **Durable File Store Fallback (`.data/store.json`)**: Automatic local store ensuring orders, reviews, and RFP inquiries persist across server restarts in offline/development setups.
 - **Fail-Safe Client**: Dynamic Prisma loader (`lib/prisma.ts`) guarantees the app boots without crashing if database credentials are not yet provisioned.
 
-### 3. Transparent Intake & Compliance
-- The checkout modal clearly presents the process as **"Translation Intake & Document Review"**.
-- Transparently communicates that certified translation documents undergo compliance assessment before Stripe payment links are dispatched.
+### 3. Transparent Intake & Document Upload Workflow
+- The intake modal operates as **"Translation Intake & Document Review"**.
+- Supports direct **multipart file uploads** (PDF, DOCX, JPG, PNG, TIFF up to 15MB/file), saving documents to `.data/uploads/<orderNumber>/`.
+- Transparently communicates the 3-step dispatch workflow: compliance file review -> itemized quote with Stripe payment link -> certified translation upon payment.
 
-### 4. Hardened API Endpoints
-- **`/api/orders`**: Strict bounding on customer names (2–100 chars), valid RFC email format, languages (2–50 chars), page bounds (1–1000), word count bounds (1–1,000,000).
-- **`/api/rfp`**: Strict validation on corporate contact name, corporate email, phone regex (7–30 digits), and project scope. Stores RFP inquiries into durable storage.
-- **`/api/reviews` & `/api/reviews/verify`**: Strict bounding on order codes, rating (integer 1–5), comment length (10–1000 chars), and post-delivery timing verification.
-- **`/api/chat`**: In-memory IP rate-limiting (30 requests/minute), message history bounds (max 15 messages, max 1000 chars/message), and strict message role filtering (`"user" | "assistant"` only).
+### 4. Hardened API Endpoints & Trusted IP Rate Limiting
+- **`/api/orders`**: Strict bounds on customer names, languages, valid RFC emails, page count (1–1000), word count (1–1,000,000), and document attachments.
+- **`/api/rfp`**: Strict validation on corporate contact name, corporate email, phone regex (7–30 digits), and project notes.
+- **`/api/reviews` & `/api/reviews/moderate`**: Full async awaiting on approvals/rejections, 404 on nonexistent IDs, and separate labeling for representative case studies (`isSample`) vs genuine verified client orders.
+- **`/api/chat`**: Trusted edge proxy IP resolution via `lib/rate-limit.ts` (Cloudflare `cf-connecting-ip`, Vercel `x-vercel-forwarded-for`, Nginx `x-real-ip`), 30 req/min sliding window rate limit, and strict message role filtering (`"user" | "assistant"` only).
 
 ---
 

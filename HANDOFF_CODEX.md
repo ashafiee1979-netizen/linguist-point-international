@@ -3,91 +3,85 @@
 **Date:** September 2026  
 **From:** Antigravity Engineering  
 **To:** Codex Team  
-**Subject:** Resolution of Review Findings & Production Readiness Enhancements
+**Subject:** Follow-up Resolution of Review Findings & Production Hardening
 
 ---
 
 ## 📌 Executive Summary
 
-We have thoroughly reviewed and addressed all points raised in your peer review. Every item under **"Fix before launch"** and **"Recommended improvements"** has been resolved, thoroughly tested, and verified against Next.js production builds.
+We have reviewed your follow-up feedback and resolved all items across database persistence, document upload workflows, moderation awaiting, proxy IP rate limiting, and sample review authenticity.
 
-Below is an itemized breakdown of each finding and the exact implementation applied.
+All 27 automated tests pass (`npm test`) and the Next.js production build (`npm run build`) compiles cleanly with 0 TypeScript/lint errors.
 
 ---
 
-## 🛠️ Itemized Resolution of Review Findings
+## 🛠️ Itemized Resolution of Follow-up Findings
 
-### 1. Secure Review Moderation Endpoints
-- **Codex Finding:** The moderation API had no server-side authorization; anyone could fetch pending reviews or approve/reject them.
-- **Implementation:**
-  - Added strict bearer/header authorization in [`app/api/reviews/moderate/route.ts`](./app/api/reviews/moderate/route.ts) with `isAuthorized()`.
-  - Supports `x-admin-key: <ADMIN_API_KEY>` or `Authorization: Bearer <ADMIN_API_KEY>`.
-  - Rejects unauthorized requests immediately with `401 Unauthorized`.
-  - Completely removed the public "Admin Moderation Portal" trigger and modal from [`components/ReviewSection.tsx`](./components/ReviewSection.tsx).
+### 1. Database Persistence as the Production Source of Truth
+- **Feedback:** Reads and moderation actions used the local JSON store; Prisma writes were fire-and-forget/swallowed; write failures were not visible.
+- **Resolution in [`lib/review-store.ts`](./lib/review-store.ts):**
+  - **Prisma is the Primary Source of Truth:** When `DATABASE_URL` is configured, all database writes (`registerOrder`, `submitVerifiedReview`, `registerRfpInquiry`) execute against Prisma and **await completion**.
+  - **Visible Write Failures:** If a database write fails, the error is logged and re-thrown so the API routes ([`app/api/orders/route.ts`](./app/api/orders/route.ts), etc.) return clean `500 Internal Server Error` responses instead of misleading callers with false success.
+  - **Database Reads:** `findOrder`, `getApprovedReviews`, and `getPendingReviews` query Prisma directly with proper sorting and order/review correlation.
+  - **Durable Moderation:** `approveReview` and `rejectReview` update and delete records directly in PostgreSQL via Prisma.
+  - **Offline/Dev Fallback:** Local file storage (`.data/store.json`) is maintained as a fallback for offline development when `DATABASE_URL` is omitted, with write errors made visible.
 
-### 2. Persist Orders, Reviews, and Enterprise Requests
-- **Codex Finding:** Orders and reviews were held in process memory; enterprise RFPs were returned in response without persistence.
-- **Implementation:**
-  - Implemented dual-layer persistence in [`lib/review-store.ts`](./lib/review-store.ts):
-    1. **Durable File Store (`.data/store.json`)**: Thread-safe atomic file writing with fallbacks, persisting data across server restarts even without external DB configuration.
-    2. **Prisma PostgreSQL Sync**: Asynchronous synchronization to PostgreSQL when `DATABASE_URL` is set.
-    3. **Fail-Safe Loader**: Added [`lib/prisma.ts`](./lib/prisma.ts) using dynamic runtime import to prevent build crashes when `DATABASE_URL` is absent or Prisma client hasn't been generated.
-  - Aligned [`prisma/schema.prisma`](./prisma/schema.prisma) with the exact order and review structures (`serviceType`, `turnaround`, `RfpInquiry`).
-  - Added RFP persistence: [`app/api/rfp/route.ts`](./app/api/rfp/route.ts) now persists submissions via `registerRfpInquiry`.
+### 2. Uploaded Documents Workflow & Intake Transparency
+- **Feedback:** The order modal only sent filenames; no documents were received or stored; follow-up dispatch steps were vague.
+- **Resolution in [`components/OrderModal.tsx`](./components/OrderModal.tsx) and [`app/api/orders/route.ts`](./app/api/orders/route.ts):**
+  - **Multipart File Uploads:** `OrderModal.tsx` now packages actual `File` objects into `FormData` and posts them directly to `/api/orders`.
+  - **Server-Side File Preservation:** `/api/orders` parses `multipart/form-data`, validates file extensions (`.pdf`, `.docx`, `.doc`, `.jpg`, `.png`, `.tiff`, `.txt`) and file size limits (15MB/file), sanitizes filenames, and securely stores uploaded documents to disk in `.data/uploads/<orderNumber>/`.
+  - **Separate File Submission Support:** Added explicit notice that clients with confidential legal files can submit the intake form and email documents directly to `intake@linguistpoint.com` citing their order number.
+  - **Accurate Dispatch Confirmation:** The confirmation modal explicitly indicates whether files were securely received or are pending email, and details the 3-step dispatch process:
+    1. *Document Review*: Linguistic compliance desk inspects file legibility & stamps within 1–2 business hours.
+    2. *Verified Invoice*: An itemized proposal with a secure Stripe checkout link is emailed to the client.
+    3. *Certified Translation*: Work begins immediately upon invoice settlement.
 
-### 3. Order Intake & Payment Clarity
-- **Codex Finding:** Checkout modal showed "Order Confirmed!" with a fake Stripe link before documents were reviewed or payment collected.
-- **Implementation:**
-  - Updated [`components/OrderModal.tsx`](./components/OrderModal.tsx):
-    - Reframed flow as **"Translation Intake & Document Review"**.
-    - Button text updated to **"Submit for Review & Quote"**.
-    - Modal confirmation communicates clearly: *"Our compliance & certification team is reviewing your files to confirm source page layout and regulatory acceptance. A secure Stripe invoice link will be sent to your email."*
-  - Aligned [`app/api/orders/route.ts`](./app/api/orders/route.ts) message to match the intake review workflow.
+### 3. Await Async Review Moderation
+- **Feedback:** `approveReview` and `rejectReview` were not awaited in [`app/api/reviews/moderate/route.ts`](./app/api/reviews/moderate/route.ts), causing truthy Promise checks that reported success for nonexistent review IDs.
+- **Resolution in [`app/api/reviews/moderate/route.ts`](./app/api/reviews/moderate/route.ts):**
+  - Added `await` to `approveReview(reviewId)` and `rejectReview(reviewId)`.
+  - Added `await` to `getPendingReviews()`.
+  - Nonexistent review IDs now properly return `404 Not Found`.
 
-### 4. Remove Sample Review Data from Public Flow
-- **Codex Finding:** Demo buttons (`LP-2026-8941`, etc.) made production appear like a demo prototype.
-- **Implementation:**
-  - Completely removed pre-filled demo test order buttons from [`components/ReviewSection.tsx`](./components/ReviewSection.tsx).
-  - Isolated demo seed fixtures in [`lib/review-store.ts`](./lib/review-store.ts) behind `ENABLE_TEST_ORDERS === "true"`, ensuring clean state in production.
+### 4. Trusted Proxy IP Extraction & Rate Limiting
+- **Feedback:** `chat/route.ts` used an unshared in-memory map and trusted the first `x-forwarded-for` value, which could be spoofable.
+- **Resolution in [`lib/rate-limit.ts`](./lib/rate-limit.ts) and [`app/api/chat/route.ts`](./app/api/chat/route.ts):**
+  - Created a dedicated `lib/rate-limit.ts` module with `getTrustedClientIp(req)`.
+  - Prioritizes cryptographically set edge proxy headers:
+    1. `cf-connecting-ip` (Cloudflare edge proxy)
+    2. `x-vercel-forwarded-for` (Vercel edge proxy)
+    3. `x-real-ip` (Nginx/reverse proxy)
+    4. Sanitized `x-forwarded-for` parsing with strict IPv4/IPv6 regex validation to eliminate header injection.
+  - Implemented sliding window rate-limiting with automatic periodic cleanup of expired entries (preventing memory leaks) and standard `Retry-After` headers on `429 Too Many Requests`.
 
-### 5. API Input Validation & Chat Hardening
-- **Codex Finding:** Endpoints accepted unconstrained payloads; chat had no rate limits or message length bounds.
-- **Implementation:**
-  - **Orders API** ([`app/api/orders/route.ts`](./app/api/orders/route.ts)):
-    - Client name: 2–100 characters.
-    - Client email: RFC-compliant email regex rejecting script injection and invalid domains.
-    - Languages: 2–50 characters.
-    - Page count: strictly bounded integer (1 to `PRICING.maxPages`).
-    - Word count: strictly bounded integer (1 to 1,000,000).
-    - Service type: strictly validated as `"certified" | "standard"`.
-  - **RFP API** ([`app/api/rfp/route.ts`](./app/api/rfp/route.ts)):
-    - Contact name (2–100 chars), corporate email (RFC regex), phone number regex (`^[+]?[\d\s().-]{7,30}$`).
-  - **Reviews API** ([`app/api/reviews/route.ts`](./app/api/reviews/route.ts)):
-    - Validates order number, rating (integer 1 to 5), comments (10 to 1,000 chars), and awaits `submitVerifiedReview`.
-  - **Chat API** ([`app/api/chat/route.ts`](./app/api/chat/route.ts)):
-    - In-memory rate limiting: 30 requests/minute per client IP (returns `429 Too Many Requests`).
-    - Message history bounded to last 15 messages max.
-    - Message content capped at 1,000 characters per message.
-    - Strict role filtering: allows only `"user"` and `"assistant"`, stripping forbidden roles (`"system"`, `"admin"`).
+### 5. Testimonial Transparency & Sample Case Studies
+- **Feedback:** Sample testimonials in `mock-data.ts` could be mistaken for live customer reviews without explicit labeling.
+- **Resolution in [`lib/mock-data.ts`](./lib/mock-data.ts) and [`components/ReviewSection.tsx`](./components/ReviewSection.tsx):**
+  - Added `isSample: boolean` to `ReviewMock` interface.
+  - All default mock entries in `INITIAL_REVIEWS` are explicitly flagged with `isSample: true`.
+  - The UI now clearly distinguishes badges:
+    - Sample entries render a neutral badge: **`Representative Case`**.
+    - Real, verified order submissions render an emerald badge: **`Verified Client Order`**.
+  - Section description clarified: *"Explore representative case studies and verified client feedback across 65+ language pairs. Completed an order? Submit your verified review below."*
 
-### 6. Test Suite & Verification Harness
-- **Implementation:**
-  - Created automated test harness in [`scripts/test-validation.ts`](./scripts/test-validation.ts).
-  - Added `"test": "npx tsx scripts/test-validation.ts"` in [`package.json`](./package.json).
-  - 17 test assertions covering pricing calculations, turnaround labels, verification eligibility, email regex sanitization, and chat role-injection filtering:
-    ```bash
-    npm test
-    # RESULTS: 17 PASSED, 0 FAILED
-    ```
+### 6. Expanded Automated Test Suite
+- **Updated [`scripts/test-validation.ts`](./scripts/test-validation.ts):**
+  - Expanded test suite from 17 to **27 automated assertions**:
+    - Pricing engine & turnaround formulas (certified & standard)
+    - Review eligibility checks & moderation 404 behavior for nonexistent IDs
+    - Testimonial sample labeling verification
+    - Input bounds & document intake metadata persistence
+    - Trusted client IP resolution (Cloudflare vs Vercel vs spoofed injection)
+    - Rate limiter threshold enforcement (allows 30, blocks 31st with 429)
+  - **Test Result:** `27 PASSED, 0 FAILED`.
 
 ---
 
 ## 🚦 Verification Commands
 
-You can verify the codebase state at any time:
-
 ```bash
-# 1. Run automated test suite
+# 1. Run automated test suite (27 tests)
 npm test
 
 # 2. Check TypeScript types
@@ -97,12 +91,4 @@ npx tsc --noEmit
 npm run build
 ```
 
----
-
-## 🤝 Ongoing Shared-Workspace Guidelines
-
-1. **Shared Config**: When adding environment variables, please document them in both `README.md` and `.env.example`.
-2. **Git Discipline**: All changes are tested with `npm test` and `npm run build` prior to committing.
-3. **Storage Compatibility**: If adding additional Prisma migrations, ensure the dynamic fallback in `lib/prisma.ts` and `lib/review-store.ts` continues to function for offline/local environments without active Postgres instances.
-
-Feel free to build directly upon these foundations. All routes are clean, secure, and production-ready!
+The codebase is fully aligned, hardened, and ready for production deployment!

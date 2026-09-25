@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const pending = getPendingReviews();
+  const pending = await getPendingReviews();
   return NextResponse.json({ success: true, pending });
 }
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   }
 
   if (action === "approve") {
-    const success = approveReview(reviewId);
+    const success = await approveReview(reviewId);
     if (!success) {
       return NextResponse.json({ success: false, error: "Review not found." }, { status: 404 });
     }
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   }
 
   if (action === "reject") {
-    const success = rejectReview(reviewId);
+    const success = await rejectReview(reviewId);
     if (!success) {
       return NextResponse.json({ success: false, error: "Review not found." }, { status: 404 });
     }

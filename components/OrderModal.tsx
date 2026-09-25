@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X, Upload, CheckCircle2, Loader2, AlertCircle, FileText, Trash2, Clock } from "lucide-react";
+import { X, Upload, CheckCircle2, Loader2, AlertCircle, FileText, Trash2, Clock, Check, Lock } from "lucide-react";
 import { POPULAR_LANGUAGES, OTHER_LANGUAGES } from "@/lib/languages";
 import { calculatePrice, PRICING } from "@/lib/pricing";
 import type { ServiceType } from "@/lib/pricing";
@@ -40,9 +40,12 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
   const [fileError, setFileError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [confirmation, setConfirmation] = useState<{ orderNumber: string; turnaround: string } | null>(
-    null
-  );
+  const [confirmation, setConfirmation] = useState<{
+    orderNumber: string;
+    turnaround: string;
+    fileCount: number;
+    fileNames: string[];
+  } | null>(null);
 
   const addOnState: Record<string, [boolean, (value: boolean) => void]> = {
     rush: [isRush, setIsRush],
@@ -158,22 +161,25 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
     setSubmitError(null);
 
     try {
+      const formData = new FormData();
+      formData.append("clientName", clientName);
+      formData.append("clientEmail", clientEmail);
+      formData.append("serviceType", serviceType);
+      formData.append("sourceLanguage", sourceLang);
+      formData.append("targetLanguage", targetLang);
+      formData.append("pageCount", String(pages));
+      formData.append("wordCount", String(words));
+      formData.append("isRush12Hour", String(isRush));
+      formData.append("isNotarized", String(isNotarized));
+      formData.append("isHardCopyMail", String(isHardCopy));
+
+      uploadedFiles.forEach((file) => {
+        formData.append("files", file);
+      });
+
       const response = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clientName,
-          clientEmail,
-          serviceType,
-          sourceLanguage: sourceLang,
-          targetLanguage: targetLang,
-          pageCount: pages,
-          wordCount: words,
-          isRush12Hour: isRush,
-          isNotarized,
-          isHardCopyMail: isHardCopy,
-          fileNames: uploadedFiles.map((f) => f.name),
-        }),
+        body: formData,
       });
 
       const result: OrderResponse = await response.json();
@@ -184,6 +190,8 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
       setConfirmation({
         orderNumber: result.order.orderNumber,
         turnaround: result.order.turnaround,
+        fileCount: uploadedFiles.length,
+        fileNames: uploadedFiles.map((f) => f.name),
       });
     } catch (error) {
       setSubmitError(
@@ -260,32 +268,78 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
           <div className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1 flex flex-col justify-center items-center">
             <CheckCircle2 className="w-14 h-14 sm:w-16 sm:h-16 text-emerald-600 mx-auto" />
             <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-              Translation Intake Received
+              Translation Intake Confirmed
             </h3>
-            <div className="text-sm text-slate-600 max-w-md mx-auto space-y-2.5">
+            <div className="text-sm text-slate-600 max-w-md mx-auto space-y-3">
               <p>
                 Your translation request has been registered under reference{" "}
                 <strong className="text-[#173d40]">{confirmation.orderNumber}</strong>.
               </p>
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm text-slate-700 text-left space-y-1.5 shadow-2xs">
+
+              {confirmation.fileCount > 0 ? (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 text-left">
+                  <p className="font-bold flex items-center gap-1.5 mb-1">
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    {confirmation.fileCount} Document{confirmation.fileCount === 1 ? "" : "s"} Securely Received
+                  </p>
+                  <p className="text-emerald-700 truncate">
+                    {confirmation.fileNames.join(", ")}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 text-left">
+                  <p className="font-bold flex items-center gap-1.5 mb-1">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    Separate File Submission
+                  </p>
+                  <p className="text-amber-800 leading-relaxed">
+                    No files were uploaded online. Please email your documents to{" "}
+                    <a
+                      href={`mailto:intake@linguistpoint.com?subject=Order%20${confirmation.orderNumber}%20Documents`}
+                      className="underline font-bold text-[#173d40]"
+                    >
+                      intake@linguistpoint.com
+                    </a>{" "}
+                    referencing Order #{confirmation.orderNumber}.
+                  </p>
+                </div>
+              )}
+
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm text-slate-700 text-left space-y-2 shadow-2xs">
                 <p className="font-bold text-slate-900 flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-[#173d40]" />
                   What happens next?
                 </p>
-                <p className="text-slate-600 leading-relaxed">
-                  Our linguistic compliance team is reviewing your document parameters for legibility and exact word count. We will email your verified price breakdown and secure Stripe checkout link to <strong className="break-all text-[#173d40]">{clientEmail}</strong> within 15–30 minutes.
-                </p>
-                <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-200">
-                  Target Turnaround: <strong className="text-slate-800">{confirmation.turnaround}</strong> (begins immediately upon payment confirmation).
+                <ol className="list-decimal list-inside space-y-1.5 text-slate-600 text-xs">
+                  <li>
+                    <strong>Document Review:</strong> Our translation desk inspects source legibility &amp; stamps within 1–2 business hours.
+                  </li>
+                  <li>
+                    <strong>Verified Invoice:</strong> An itemized proposal with a secure Stripe checkout link will be sent to <strong className="break-all text-[#173d40]">{clientEmail}</strong>.
+                  </li>
+                  <li>
+                    <strong>Certified Translation:</strong> Translation commences immediately upon invoice settlement.
+                  </li>
+                </ol>
+                <p className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-200">
+                  Target Turnaround: <strong className="text-slate-800">{confirmation.turnaround}</strong>. No payment has been charged yet.
                 </p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="mt-2 bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-lg transition-colors shadow-sm"
-            >
-              Done
-            </button>
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href={`mailto:intake@linguistpoint.com?subject=Order%20${confirmation.orderNumber}%20Inquiry`}
+                className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-lg transition-colors"
+              >
+                Email Support Desk
+              </a>
+              <button
+                onClick={onClose}
+                className="bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs px-6 py-2.5 rounded-lg transition-colors shadow-sm"
+              >
+                Done
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleOrderSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
@@ -370,6 +424,11 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                     {fileError}
                   </p>
                 )}
+
+                <p className="mt-1.5 text-[11px] text-slate-500 leading-normal flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                  Files are securely encrypted. Prefer emailing files? You can submit this request and email documents to <strong className="text-slate-700">intake@linguistpoint.com</strong>.
+                </p>
               </div>
 
               {/* Name & Email in 2 columns */}

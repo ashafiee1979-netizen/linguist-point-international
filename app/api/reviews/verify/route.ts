@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = verifyOrderEligibility(orderNumber, clientEmail);
+  const result = await verifyOrderEligibility(orderNumber, clientEmail);
 
   return NextResponse.json({
     success: true,

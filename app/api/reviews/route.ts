@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getApprovedReviews, submitVerifiedReview } from "@/lib/review-store";
 
 export async function GET() {
-  const reviews = getApprovedReviews();
+  const reviews = await getApprovedReviews();
   return NextResponse.json({ success: true, reviews });
 }
 

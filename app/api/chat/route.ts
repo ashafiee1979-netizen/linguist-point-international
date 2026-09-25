@@ -4,28 +4,9 @@ import {
   generateLocalAssistantResponse,
 } from "@/lib/chat-knowledge";
 
+import { getTrustedClientIp, checkRateLimit } from "@/lib/rate-limit";
+
 export const dynamic = "force-dynamic";
-
-// Basic in-memory rate limiting map for public endpoint
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const MAX_REQUESTS_PER_MINUTE = 30;
-
-function isRateLimited(clientIp: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(clientIp);
-
-  if (!entry || now > entry.resetTime) {
-    rateLimitMap.set(clientIp, { count: 1, resetTime: now + 60_000 });
-    return false;
-  }
-
-  if (entry.count >= MAX_REQUESTS_PER_MINUTE) {
-    return true;
-  }
-
-  entry.count++;
-  return false;
-}
 
 interface IncomingMessage {
   role?: unknown;
@@ -39,16 +20,19 @@ interface ChatRequestBody {
 
 export async function POST(req: Request) {
   try {
-    // 1. Rate limiting by IP
-    const clientIp =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("x-real-ip") ||
-      "anonymous";
+    // 1. Rate limiting by trusted client IP
+    const clientIp = getTrustedClientIp(req);
+    const rateLimit = checkRateLimit(clientIp);
 
-    if (isRateLimited(clientIp)) {
+    if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: "Too many chat requests. Please slow down." },
-        { status: 429 }
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.ceil((rateLimit.resetTime - Date.now()) / 1000)),
+          },
+        }
       );
     }
 
