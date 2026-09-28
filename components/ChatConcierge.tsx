@@ -236,7 +236,7 @@ export const ChatConcierge: React.FC<ChatConciergeProps> = ({ onOpenOrder, onSel
         <div
           role="dialog"
           aria-label="AI Translation Concierge & Instant Answers"
-          className="fixed bottom-20 right-3 sm:right-6 z-50 w-[92vw] sm:w-[380px] h-[480px] max-h-[72vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-modal-in"
+          className="fixed bottom-20 right-3 sm:right-6 z-50 w-[calc(100vw-1.5rem)] sm:w-[380px] h-[480px] max-h-[75dvh] sm:max-h-[72vh] bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-modal-in"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-[#173d40] via-[#1a474b] to-[#123032] text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
@@ -447,7 +447,7 @@ export const ChatConcierge: React.FC<ChatConciergeProps> = ({ onOpenOrder, onSel
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Ask any question (e.g. USCIS, pricing, speed)…"
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:bg-white transition-colors"
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-base sm:text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:bg-white transition-colors"
             />
             <button
               type="submit"

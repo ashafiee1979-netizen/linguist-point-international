@@ -165,7 +165,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
         </div>
 
         {/* Right Column: Instant Live Order Calculator */}
-        <div className="lg:col-span-5 w-full lg:-mt-8 xl:-mt-10" id="order">
+        <div className="lg:col-span-5 w-full max-w-xl mx-auto lg:max-w-none lg:-mt-8 xl:-mt-10" id="order">
           <div className={`bg-white rounded-2xl border p-4 sm:p-5 shadow-xl relative transition-all duration-300 ${
             isHighlighted
               ? "border-[#173d40] ring-4 ring-[#173d40]/25 shadow-2xl scale-[1.01]"
@@ -342,26 +342,26 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
               )}
 
               {/* Add-ons */}
-              <div className="space-y-1 pt-1.5 border-t border-slate-100">
+              <div className="space-y-1.5 pt-1.5 border-t border-slate-100">
                 {ADD_ONS.map((addOn) => {
                   const [checked, setChecked] = addOnState[addOn.key];
                   return (
                     <label
                       key={addOn.key}
-                      className={`flex items-center justify-between gap-2 py-1 px-2.5 rounded-lg border cursor-pointer transition-colors text-sm ${
+                      className={`flex items-start sm:items-center justify-between gap-2 py-1.5 px-2.5 sm:px-3 rounded-lg border cursor-pointer transition-colors text-xs sm:text-sm ${
                         checked ? "border-teal-500 bg-teal-50/70 shadow-2xs" : "border-slate-200 hover:bg-slate-50"
                       }`}
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-start sm:items-center gap-2 min-w-0 flex-1">
                         <input
                           type="checkbox"
                           checked={checked}
                           onChange={(e) => setChecked(e.target.checked)}
-                          className="w-4 h-4 flex-shrink-0 accent-[#173d40] rounded"
+                          className="w-4 h-4 mt-0.5 sm:mt-0 flex-shrink-0 accent-[#173d40] rounded"
                         />
-                        <span className="font-semibold text-slate-800 leading-snug">{addOn.label}</span>
+                        <span className="font-semibold text-slate-800 leading-snug break-words">{addOn.label}</span>
                       </span>
-                      <span className="font-bold text-slate-700 whitespace-nowrap">
+                      <span className="font-bold text-slate-700 whitespace-nowrap flex-shrink-0 text-right">
                         +${addOn.fee.toFixed(2)}
                       </span>
                     </label>
@@ -371,9 +371,14 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
 
               {/* Breakdown & total */}
               <div className="pt-1.5 border-t border-slate-200">
-                <div className="flex justify-between items-center text-xs sm:text-sm text-slate-600 pb-1">
-                  <span>Base: <strong className="text-slate-800">${price.basePrice.toFixed(2)}</strong>{price.addOnsPrice > 0 ? ` • Add-ons: +$${price.addOnsPrice.toFixed(2)}` : ""}</span>
-                  <span className="font-bold text-[#173d40] flex items-center gap-1">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1 text-xs text-slate-600 pb-1">
+                  <span className="truncate">
+                    Base: <strong className="text-slate-800">${price.basePrice.toFixed(2)}</strong>
+                    {price.addOnsPrice > 0 && (
+                      <span className="text-teal-700"> • Add-ons: +${price.addOnsPrice.toFixed(2)}</span>
+                    )}
+                  </span>
+                  <span className="font-bold text-[#173d40] flex items-center gap-1 flex-shrink-0">
                     <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                     {price.turnaround}
                   </span>
@@ -388,7 +393,7 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
 
                 <button
                   onClick={handleStartOrder}
-                  className="w-full bg-[#173d40] hover:bg-[#123032] text-white font-extrabold text-base py-2.5 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-98"
+                  className="w-full min-h-[48px] bg-[#173d40] hover:bg-[#123032] text-white font-extrabold text-sm sm:text-base py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-98"
                 >
                   Start Order Now
                   <ArrowRight className="w-4 h-4" strokeWidth={2.25} />

@@ -4,7 +4,7 @@
 
 /** Base look shared by every text-like control. */
 const controlBase =
-  "w-full rounded-xl border border-slate-300 bg-white text-slate-900 text-sm " +
+  "w-full rounded-xl border border-slate-300 bg-white text-slate-900 text-base sm:text-sm " +
   "placeholder:text-slate-400 shadow-xs outline-none transition-all duration-150 " +
   "hover:border-slate-400 " +
   "focus:border-[#173d40] focus:ring-4 focus:ring-[#173d40]/10 " +

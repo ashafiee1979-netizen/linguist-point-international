@@ -234,7 +234,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-fade-in"
+      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex sm:items-center justify-center p-0 sm:p-4 overflow-hidden animate-fade-in"
       onClick={handleBackdropClick}
     >
       <div
@@ -242,22 +242,22 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
         role="dialog"
         aria-modal="true"
         aria-labelledby="order-modal-title"
-        className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl relative flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden animate-modal-in border border-slate-200"
+        className="bg-white sm:rounded-2xl rounded-none max-w-2xl w-full shadow-2xl relative flex flex-col h-[100dvh] sm:h-auto sm:max-h-[90dvh] overflow-hidden animate-modal-in border-0 sm:border sm:border-slate-200"
       >
         {/* Pinned Header */}
-        <div className="px-5 sm:px-6 py-3.5 border-b border-slate-100 flex items-center justify-between flex-shrink-0 bg-white">
-          <div className="flex items-center gap-2.5">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-teal-800 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200/60">
-              Translation Intake
+        <div className="px-4 sm:px-6 py-3 sm:py-3.5 border-b border-slate-100 flex items-center justify-between flex-shrink-0 bg-white">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-teal-200/60 flex-shrink-0">
+              Intake
             </span>
-            <h3 id="order-modal-title" className="text-base sm:text-lg font-extrabold text-slate-900">
+            <h3 id="order-modal-title" className="text-sm sm:text-base md:text-lg font-extrabold text-slate-900 truncate">
               {confirmation ? "Intake Confirmation" : "Upload Documents & Request Translation"}
             </h3>
           </div>
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
+            className="p-1.5 sm:p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors flex-shrink-0"
             aria-label="Close order form"
           >
             <X className="w-5 h-5" />
@@ -326,16 +326,16 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-2 w-full sm:w-auto justify-center">
               <a
                 href={`mailto:intake@linguistpoint.com?subject=Order%20${confirmation.orderNumber}%20Inquiry`}
-                className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-lg transition-colors"
+                className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-colors text-center"
               >
                 Email Support Desk
               </a>
               <button
                 onClick={onClose}
-                className="bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs px-6 py-2.5 rounded-lg transition-colors shadow-sm"
+                className="bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-colors shadow-sm text-center"
               >
                 Done
               </button>
@@ -344,7 +344,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
         ) : (
           <form onSubmit={handleOrderSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
             {/* Scrollable Form Body */}
-            <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 space-y-3.5">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-3.5 sm:py-4 space-y-3 sm:space-y-3.5">
               {/* Service type segmented switcher */}
               <div
                 className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl"
@@ -445,7 +445,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
                     placeholder="e.g. Maria Gonzalez"
-                    className={`${inputClass} text-xs sm:text-sm py-2`}
+                    className={`${inputClass} text-base sm:text-sm py-2 sm:py-2.5 h-11 sm:h-10`}
                   />
                 </div>
                 <div>
@@ -460,7 +460,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                     value={clientEmail}
                     onChange={(e) => setClientEmail(e.target.value)}
                     placeholder="name@example.com"
-                    className={`${inputClass} text-xs sm:text-sm py-2`}
+                    className={`${inputClass} text-base sm:text-sm py-2 sm:py-2.5 h-11 sm:h-10`}
                   />
                 </div>
               </div>
@@ -475,7 +475,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                     id="order-source"
                     value={sourceLang}
                     onChange={(e) => setSourceLang(e.target.value)}
-                    className="text-xs sm:text-sm py-2"
+                    className="text-base sm:text-sm py-2 sm:py-2.5 h-11 sm:h-10"
                   >
                     {sourceLang && !ALL_LANGUAGE_OPTIONS.some((l) => l.name === sourceLang) && (
                       <option value={sourceLang}>{sourceLang}</option>
@@ -491,7 +491,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                     id="order-target"
                     value={targetLang}
                     onChange={(e) => setTargetLang(e.target.value)}
-                    className="text-xs sm:text-sm py-2"
+                    className="text-base sm:text-sm py-2 sm:py-2.5 h-11 sm:h-10"
                   >
                     {renderLanguageOptions("m-tgt")}
                   </Select>
@@ -512,7 +512,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                         onChange={(e) =>
                           setPages(Math.min(PRICING.maxPages, Math.max(1, parseInt(e.target.value, 10) || 1)))
                         }
-                        className={`${inputClass} no-spinner text-center font-bold text-xs sm:text-sm py-2`}
+                        className={`${inputClass} no-spinner text-center font-bold text-base sm:text-sm py-2 sm:py-2.5 h-11 sm:h-10`}
                       />
                     </>
                   ) : (
@@ -528,7 +528,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
                         step={50}
                         value={words}
                         onChange={(e) => setWords(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                        className={`${inputClass} no-spinner text-center font-bold text-xs sm:text-sm py-2`}
+                        className={`${inputClass} no-spinner text-center font-bold text-base sm:text-sm py-2 sm:py-2.5 h-11 sm:h-10`}
                       />
                     </>
                   )}
@@ -584,48 +584,50 @@ export const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, initial
             </div>
 
             {/* Pinned Sticky Footer */}
-            <div className="px-5 sm:px-6 py-3 bg-slate-50 border-t border-slate-200 flex-shrink-0 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div>
-                  <span className="text-[10px] text-slate-500 block uppercase font-bold tracking-wider leading-none">
-                    Total Cost
-                  </span>
-                  <span className="text-xl sm:text-2xl font-black text-[#173d40] leading-tight">
-                    ${price.totalAmount.toFixed(2)}
-                  </span>
-                </div>
-                <div className="hidden sm:block text-[11px] text-slate-500 border-l border-slate-200 pl-3 leading-snug">
+            <div className="px-4 sm:px-6 py-2.5 sm:py-3.5 bg-slate-50 border-t border-slate-200 flex-shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+                <div className="flex items-center justify-between sm:justify-start gap-3">
                   <div>
-                    Base: <strong className="text-slate-700">${price.basePrice.toFixed(2)}</strong>
-                    {price.addOnsPrice > 0 && (
-                      <span className="text-teal-700"> • Add-ons: +${price.addOnsPrice.toFixed(2)}</span>
-                    )}
+                    <span className="text-[10px] text-slate-500 block uppercase font-bold tracking-wider leading-none">
+                      Total Cost
+                    </span>
+                    <span className="text-xl sm:text-2xl font-black text-[#173d40] leading-tight">
+                      ${price.totalAmount.toFixed(2)}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1 text-slate-700 font-semibold mt-0.5">
-                    <Clock className="w-3 h-3 text-[#173d40]" />
-                    <span>Est: {price.turnaround}</span>
+                  <div className="text-[11px] text-slate-600 sm:border-l sm:border-slate-200 sm:pl-3 leading-snug text-right sm:text-left">
+                    <div>
+                      Base: <strong className="text-slate-800">${price.basePrice.toFixed(2)}</strong>
+                      {price.addOnsPrice > 0 && (
+                        <span className="text-teal-700"> • Add-ons: +${price.addOnsPrice.toFixed(2)}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-end sm:justify-start gap-1 text-slate-700 font-semibold mt-0.5">
+                      <Clock className="w-3 h-3 text-[#173d40] flex-shrink-0" />
+                      <span>Est: {price.turnaround}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex flex-col items-end">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-[#173d40] hover:bg-[#123032] disabled:opacity-60 disabled:cursor-not-allowed text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 sm:py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 flex-shrink-0 active:scale-98"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Submitting Intake…
-                    </>
-                  ) : (
-                    "Submit for Review & Quote"
-                  )}
-                </button>
-                <span className="text-[10px] text-slate-500 mt-1 hidden sm:inline">
-                  No charge now • Stripe invoice sent after review
-                </span>
+                <div className="flex flex-col items-stretch sm:items-end w-full sm:w-auto">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full sm:w-auto min-h-[46px] sm:min-h-[48px] bg-[#173d40] hover:bg-[#123032] disabled:opacity-60 disabled:cursor-not-allowed text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 sm:py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 flex-shrink-0 active:scale-98"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Submitting Intake…
+                      </>
+                    ) : (
+                      "Submit for Review & Quote"
+                    )}
+                  </button>
+                  <span className="text-[10px] text-slate-500 mt-1 text-center sm:text-right">
+                    No charge now • Stripe invoice sent after review
+                  </span>
+                </div>
               </div>
             </div>
           </form>
