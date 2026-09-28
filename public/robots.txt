@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/reviews/moderate
+Disallow: /api/reviews/verify
+
+Sitemap: https://linguistpoint.com/sitemap.xml
