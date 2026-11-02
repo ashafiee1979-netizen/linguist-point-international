@@ -159,9 +159,12 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
             <span className="text-sm font-extrabold text-slate-900">{SITE.rating} Rating</span>
             <span className="text-slate-300" aria-hidden="true">|</span>
             <span className="text-xs font-semibold text-slate-600">
-              {SITE.clientCount} Verified Certified Documents Delivered
+              {SITE.pagesTranslated} Pages of Certified Translations Delivered*
             </span>
           </div>
+          <p className="text-[11px] text-slate-500 mt-2 leading-tight">
+            *Includes translation and certified document volume completed across institutional engagements by parent entity PUL Consulting Services.
+          </p>
         </div>
 
         {/* Right Column: Instant Live Order Calculator */}

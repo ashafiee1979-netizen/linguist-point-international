@@ -9,6 +9,7 @@ export const SITE = {
   emailHref: "mailto:support@linguistpoint.com",
   ataMemberNumber: "274892",
   languageCount: "65+",
+  pagesTranslated: "5,000+",
   clientCount: "5,000+",
   rating: "4.9 / 5.0",
   promoCode: "LPGLOBAL20",
