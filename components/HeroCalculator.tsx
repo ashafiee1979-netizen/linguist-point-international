@@ -151,13 +151,24 @@ export const HeroCalculator: React.FC<HeroCalculatorProps> = ({
           </div>
 
           <div className="pt-5 sm:pt-6 border-t border-slate-200 flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="flex items-center gap-1 text-[#f59e0b]" aria-hidden="true">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-current" />
-              ))}
-            </span>
-            <span className="text-sm font-extrabold text-slate-900">{SITE.rating} Rating</span>
-            <span className="text-slate-300" aria-hidden="true">|</span>
+            <a
+              href="#reviews"
+              className="group inline-flex items-center gap-2 px-2.5 py-1 -ml-2.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+              title="Click to view our verified reviews"
+            >
+              <span className="flex items-center gap-0.5 text-[#f59e0b]" aria-hidden="true">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+                ))}
+              </span>
+              <span className="text-sm font-extrabold text-slate-900 group-hover:text-[#173d40] group-hover:underline">
+                {SITE.rating} Rating
+              </span>
+              <span className="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded">
+                100+ Reviews
+              </span>
+            </a>
+            <span className="text-slate-300 hidden sm:inline" aria-hidden="true">|</span>
             <span className="text-xs font-semibold text-slate-600">
               {SITE.pagesTranslated} Pages of Certified Translations Delivered*
             </span>

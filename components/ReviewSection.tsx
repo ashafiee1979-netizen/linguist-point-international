@@ -41,7 +41,6 @@ interface PendingReview {
 export const ReviewSection: React.FC = () => {
   const [reviews, setReviews] = useState<ReviewMock[]>(INITIAL_REVIEWS);
   const [showReviewGate, setShowReviewGate] = useState(false);
-  const [showAllReviews, setShowAllReviews] = useState(false);
 
   // Step 1: Verification Form State
   const [orderNumber, setOrderNumber] = useState("");
@@ -195,14 +194,20 @@ export const ReviewSection: React.FC = () => {
         {/* Total Reviews Counter Pill */}
         <div className="flex items-center justify-center gap-2 mb-6 sm:mb-8">
           <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-[#173d40] bg-teal-50 border border-teal-200/80 px-3.5 py-1.5 rounded-full shadow-2xs">
-            <ShieldCheck className="w-4 h-4 text-teal-600" />
-            Showing {showAllReviews ? reviews.length : 6} of {reviews.length}+ Verified Client Reviews &amp; Case Studies
+            <span className="flex items-center text-[#f59e0b]">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-current" />
+              ))}
+            </span>
+            <span className="font-extrabold text-slate-900">4.9 / 5.0</span>
+            <span className="text-slate-300" aria-hidden="true">•</span>
+            <span>Based on 100+ Verified Client Reviews &amp; Case Studies</span>
           </span>
         </div>
 
-        {/* Reviews Grid - Beautifully organized, compact, 3 columns */}
+        {/* Reviews Grid - Beautifully organized, compact, 3 columns x 2 rows (Showing 6) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 mb-6 sm:mb-8">
-          {(showAllReviews ? reviews : reviews.slice(0, 6)).map((rev) => (
+          {reviews.slice(0, 6).map((rev) => (
             <div
               key={rev.id}
               className="bg-slate-50 border border-slate-200/90 rounded-xl p-3.5 sm:p-4 flex flex-col justify-between hover:bg-white hover:border-[#173d40]/40 hover:shadow-md transition-all duration-200"
@@ -261,22 +266,6 @@ export const ReviewSection: React.FC = () => {
             </div>
           ))}
         </div>
-
-        {/* View All / Collapse Reviews Toggle Button */}
-        {reviews.length > 6 && (
-          <div className="flex justify-center mb-10">
-            <button
-              type="button"
-              onClick={() => setShowAllReviews(!showAllReviews)}
-              className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-[#173d40] border border-slate-300 hover:border-[#173d40] font-bold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-2xs transition-all"
-            >
-              <span>{showAllReviews ? "Show Featured 6 Reviews" : `View All ${reviews.length} Client Reviews`}</span>
-              <span className="bg-teal-100 text-[#173d40] text-[11px] font-extrabold px-2 py-0.5 rounded-full">
-                {showAllReviews ? "Collapse" : `+${reviews.length - 6} more`}
-              </span>
-            </button>
-          </div>
-        )}
 
         {/* Compact Interactive Verified Review Card */}
         <div className="max-w-3xl mx-auto bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 shadow-2xs">
