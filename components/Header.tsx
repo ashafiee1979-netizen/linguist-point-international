@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
   }, [isMenuOpen]);
 
   return (
-    <>
+    <div className="sticky top-0 z-40">
       {showBanner && (
         <div className="bg-[#173d40] text-slate-200 text-xs py-2 border-b border-teal-800">
           <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row items-center justify-between gap-2">
@@ -89,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
         </div>
       )}
 
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-slate-200 shadow-sm">
+      <header className="bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-18 sm:h-22 flex items-center justify-between gap-4">
           <a href="/" className="flex items-center gap-3 shrink-0" aria-label={`${SITE.name} — home`}>
             <img
@@ -155,6 +155,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
           </nav>
         )}
       </header>
-    </>
+    </div>
   );
 };
