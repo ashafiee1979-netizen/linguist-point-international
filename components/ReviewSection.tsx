@@ -41,7 +41,6 @@ interface PendingReview {
 export const ReviewSection: React.FC = () => {
   const [reviews, setReviews] = useState<ReviewMock[]>(INITIAL_REVIEWS);
   const [showReviewGate, setShowReviewGate] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(6);
 
   // Step 1: Verification Form State
   const [orderNumber, setOrderNumber] = useState("");
@@ -206,9 +205,9 @@ export const ReviewSection: React.FC = () => {
           </span>
         </div>
 
-        {/* Reviews Grid - Beautifully organized, compact, 3 columns */}
+        {/* Reviews Grid - Beautifully organized, compact, 3 columns x 2 rows (Showing 6 Featured) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 mb-6 sm:mb-8">
-          {reviews.slice(0, visibleCount).map((rev) => (
+          {reviews.slice(0, 6).map((rev) => (
             <div
               key={rev.id}
               className="bg-slate-50 border border-slate-200/90 rounded-xl p-3.5 sm:p-4 flex flex-col justify-between hover:bg-white hover:border-[#173d40]/40 hover:shadow-md transition-all duration-200"
@@ -268,37 +267,17 @@ export const ReviewSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Continuation / Pagination Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
-          {visibleCount < reviews.length ? (
-            <>
-              <button
-                type="button"
-                onClick={() => setVisibleCount((prev) => Math.min(prev + 12, reviews.length))}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#173d40] hover:bg-[#123032] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-2xs transition-all cursor-pointer"
-              >
-                <span>Load More Reviews</span>
-                <span className="bg-teal-900/60 text-teal-200 text-[11px] font-extrabold px-2 py-0.5 rounded-full">
-                  +{Math.min(12, reviews.length - visibleCount)}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setVisibleCount(reviews.length)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-[#173d40] border border-slate-300 hover:border-[#173d40] font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-2xs transition-all cursor-pointer"
-              >
-                <span>View All {reviews.length} Reviews</span>
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setVisibleCount(6)}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-6 py-2.5 rounded-full transition-all cursor-pointer"
-            >
-              <span>Collapse Back to 6 Featured</span>
-            </button>
-          )}
+        {/* Link to Dedicated All Reviews Page */}
+        <div className="flex justify-center mb-10">
+          <a
+            href="/reviews"
+            className="group inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-[#173d40] border border-slate-300 hover:border-[#173d40] font-bold text-xs sm:text-sm px-6 py-3 rounded-full shadow-2xs hover:shadow-md transition-all cursor-pointer"
+          >
+            <span>Explore All {reviews.length} Client Reviews &amp; Case Studies</span>
+            <span className="bg-teal-100 text-[#173d40] text-[11px] font-extrabold px-2.5 py-0.5 rounded-full group-hover:bg-[#173d40] group-hover:text-white transition-colors">
+              View All &rarr;
+            </span>
+          </a>
         </div>
 
         {/* Compact Interactive Verified Review Card */}
