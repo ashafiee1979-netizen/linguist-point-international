@@ -9,11 +9,12 @@ interface HeaderProps {
 }
 
 const NAV_LINKS = [
-  { href: "#services", label: "Services" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#industries", label: "Industries" },
-  { href: "#reviews", label: "Reviews" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/", label: "Home" },
+  { href: "/#services", label: "Services" },
+  { href: "/#how-it-works", label: "How It Works" },
+  { href: "/#industries", label: "Industries" },
+  { href: "/reviews", label: "Reviews" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
@@ -90,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
 
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-18 sm:h-22 flex items-center justify-between gap-4">
-          <a href="#" className="flex items-center gap-3 shrink-0" aria-label={`${SITE.name} — home`}>
+          <a href="/" className="flex items-center gap-3 shrink-0" aria-label={`${SITE.name} — home`}>
             <img
               src="/assets/logo-horizontal-cropped.png"
               alt={SITE.name}
