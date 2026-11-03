@@ -57,6 +57,11 @@
     overflow-wrap: break-word;
   }
 
+  /* Pause marquee animation on hover */
+  .hover-pause:hover .animate-marquee {
+    animation-play-state: paused;
+  }
+
   /* Anchored sections start below the sticky header instead of under it. */
   section[id],
   div[id] {
