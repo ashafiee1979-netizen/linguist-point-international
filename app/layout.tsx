@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased text-slate-800 bg-white overflow-x-hidden w-full">
+      <body className="font-sans antialiased text-slate-800 bg-white w-full">
         {children}
       </body>
     </html>

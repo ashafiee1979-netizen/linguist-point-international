@@ -26,6 +26,10 @@
 }
 
 @layer base {
+  html, body {
+    overflow-x: clip;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
