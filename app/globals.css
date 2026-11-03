@@ -16,12 +16,12 @@
   --bg-card: #ffffff;
   --border: #e2e8f0;
   /* Height of the sticky header, used to offset in-page anchor targets. */
-  --header-height: 4rem;
+  --header-height: 7rem;
 }
 
 @media (min-width: 640px) {
   :root {
-    --header-height: 5rem;
+    --header-height: 8.5rem;
   }
 }
 

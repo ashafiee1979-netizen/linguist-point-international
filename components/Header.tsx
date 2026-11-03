@@ -21,6 +21,28 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
   const [showBanner, setShowBanner] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    setIsMenuOpen(false);
+    if (href === "/") {
+      if (window.location.pathname === "/") {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+
+    if (href.startsWith("/#")) {
+      const targetId = href.replace("/#", "");
+      if (window.location.pathname === "/") {
+        e.preventDefault();
+        const elem = document.getElementById(targetId);
+        if (elem) {
+          elem.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
+  };
+
   // The mobile sheet is a full-width overlay, so stop the page behind it from
   // scrolling while it is open.
   useEffect(() => {
@@ -101,7 +123,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
 
           <nav className="hidden md:flex items-center gap-5 lg:gap-8 text-sm font-semibold text-slate-700">
             {NAV_LINKS.map((link) => (
-              <a key={link.href} href={link.href} className="hover:text-[#173d40] transition-colors">
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="hover:text-[#173d40] transition-colors cursor-pointer"
+              >
                 {link.label}
               </a>
             ))}
@@ -134,8 +161,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder }) => {
                 <li key={link.href} className="border-b border-slate-100 last:border-b-0">
                   <a
                     href={link.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block py-3.5 text-sm font-semibold text-slate-700 hover:text-[#173d40] transition-colors"
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className="block py-3.5 text-sm font-semibold text-slate-700 hover:text-[#173d40] transition-colors cursor-pointer"
                   >
                     {link.label}
                   </a>
