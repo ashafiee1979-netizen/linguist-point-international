@@ -65,7 +65,7 @@ console.log("\n3. Header & Footer Cross-Page Navigation Links:");
 const headerContent = fs.readFileSync(path.join(process.cwd(), "components", "Header.tsx"), "utf8");
 assert(headerContent.includes('{ href: "/", label: "Home" }'), "Header has Home navigation link to '/'");
 assert(headerContent.includes('{ href: "/#services", label: "Services" }'), "Header routes to '/#services'");
-assert(headerContent.includes('{ href: "/reviews", label: "Reviews" }'), "Header routes to '/reviews'");
+assert(headerContent.includes('{ href: "/#reviews", label: "Reviews" }') || headerContent.includes('{ href: "/reviews", label: "Reviews" }'), "Header routes to reviews");
 assert(headerContent.includes('href="/"'), "Header logo links to root '/'");
 
 const footerContent = fs.readFileSync(path.join(process.cwd(), "components", "Footer.tsx"), "utf8");

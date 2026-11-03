@@ -82,28 +82,28 @@ export default function Home() {
       {/* 6. How It Works (3 Steps) */}
       <HowItWorks onOpenOrder={() => handleOpenOrder()} />
 
-      {/* 7. Language Availability Lookup */}
+      {/* 7. Client Feedback & Case Studies (Elevated for Early Trust & Social Proof) */}
+      <ReviewSection />
+
+      {/* 8. Language Availability Lookup */}
       <LanguageLookup
         onOpenOrder={handleOpenOrder}
         onSelectLanguage={handleSelectLanguage}
       />
 
-      {/* 8. Specialized Industry Solutions */}
+      {/* 9. Specialized Industry Solutions */}
       <IndustriesSection onOpenOrder={() => handleOpenOrder()} />
 
-      {/* 9. ATA Accreditation & Statutory Recognition */}
+      {/* 10. ATA Accreditation & Statutory Recognition */}
       <StatutorySection onOpenOrder={() => handleOpenOrder()} />
 
-      {/* 10. Enterprise Multilateral Heritage (PUL & Key Logos) */}
+      {/* 11. Enterprise Multilateral Heritage (PUL & Key Logos) */}
       <EnterpriseHeritage />
 
-      {/* 11. Enterprise RFP & Volume Proposal */}
+      {/* 12. Enterprise RFP & Volume Proposal */}
       <EnterpriseProposal />
 
-      {/* 12. Client Feedback & Interactive Review Form */}
-      <ReviewSection />
-
-      {/* 13. Comprehensive Accordion FAQ */}
+      {/* 13. Comprehensive Clarity & Legal Compliance FAQ */}
       <FaqSection onOpenOrder={() => handleOpenOrder()} />
 
       {/* 14. Conversion Strip */}
